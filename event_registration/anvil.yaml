@@ -1,0 +1,135 @@
+# =============================================================================
+# anvil.yaml - global config for the Event Registration Anvil app
+# =============================================================================
+# Reference: https://github.com/anvil-works/anvil-runtime/blob/master/doc/app-structure.md
+# Each key is documented inline below. This file is read by both the Anvil
+# online IDE and the standalone `anvil-app-server` Docker image.
+
+# Human-readable app name (shown in browser tab + Anvil dashboard).
+name: Event Registration System
+
+# Top-level Python package name. Must match the directory containing this file.
+package_name: event_registration
+
+# Disable third-party embedding (this is an organiser tool, not a public widget).
+allow_embedding: false
+
+# Python 3 on both client and server. `version: 2` is the schema version for
+# the runtime_options block itself, not the Python version.
+runtime_options: {version: 2, client_version: '3'}
+
+# Browser tab title, meta description, and favicon. logo.jpg (if present) lives
+# in theme/assets/ ; we omit it here and use the default Anvil logo.
+metadata:
+  title: PyDublin Workshop 2026 - Registration
+  description: >-
+    Low-code Event Registration System built with Anvil (Python) for the
+    D4B - Elective 2: Business Programming final project (Option B).
+
+# The Form loaded when a user opens the app. Relative to client_code/.
+startup: {type: form, module: Home}
+
+# -----------------------------------------------------------------------------
+# Native libraries (the mandatory JavaScript interaction)
+# -----------------------------------------------------------------------------
+# This satisfies the Option B requirement: "at least one simple JavaScript
+# interaction." The function below adds a small JS module to <head> that
+# listens for .copy-btn clicks and copies the registration ref to the clipboard.
+# A Python handler in HomeForm.py triggers it via anvil.js.call_js().
+native_deps:
+  head_html: |
+    <script>
+    // Exposed to Python via anvil.js.call_js('copyRefToClipboard', ref)
+    window.copyRefToClipboard = function (ref) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(ref);
+      }
+      return ref;
+    };
+    // Live character counter for the notes field - pure JS, no Python round-trip
+    document.addEventListener('DOMContentLoaded', function () {
+      document.body.addEventListener('input', function (e) {
+        if (e.target && e.target.matches('#notes-field')) {
+          var max = 280;
+          var remaining = max - (e.target.value || '').length;
+          var counter = document.getElementById('notes-counter');
+          if (counter) { counter.textContent = remaining + ' characters left'; }
+        }
+      });
+    });
+    </script>
+
+# -----------------------------------------------------------------------------
+# Services
+# -----------------------------------------------------------------------------
+# 1. Data Tables (built-in SQLite-backed store; required for our db_schema).
+# 2. App Secrets (stores the shared organiser password out of source code).
+services:
+  - source: /runtime/services/tables.yml
+    client_config: {}
+    server_config: {auto_create_missing_columns: false}
+  - source: /runtime/services/secrets.yml
+    client_config: {}
+    server_config: {}
+
+# -----------------------------------------------------------------------------
+# Database schema - TWO RELATED TABLES (Event, Registration)
+# -----------------------------------------------------------------------------
+# The Registration.event_id column is a `liveObject` link into the Event table,
+# satisfying the Option B requirement: "at least two related tables".
+db_schema:
+  - name: Event
+    id: 1
+    python_name: event
+    columns:
+      ev_title_id:
+        name: title
+        type: string
+      ev_date_id:
+        name: date
+        type: datetime
+      ev_location_id:
+        name: location
+        type: string
+      ev_capacity_id:
+        name: capacity
+        type: number
+      ev_description_id:
+        name: description
+        type: string
+      ev_price_id:
+        name: price
+        type: number
+    access: {python_name: event, server: full, client: full, table_id: 1}
+
+  - name: Registration
+    id: 2
+    python_name: registration
+    columns:
+      rg_name_id:
+        name: name
+        type: string
+      rg_email_id:
+        name: email
+        type: string
+      rg_phone_id:
+        name: phone
+        type: string
+      rg_company_id:
+        name: company
+        type: string
+      rg_notes_id:
+        name: notes
+        type: string
+      rg_status_id:
+        name: status
+        type: string   # 'registered' | 'cancelled'
+      rg_created_id:
+        name: created_at
+        type: datetime
+      rg_event_id:
+        name: event_id
+        type: liveObject
+        backend: anvil.tables.Row
+        table_id: 1     # FK -> Event table (the relationship)
+    access: {python_name: registration, server: full, client: full, table_id: 2}

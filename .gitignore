@@ -1,0 +1,27 @@
+# --- Anvil standalone app-server artefacts ---
+.anvil-data/
+.anvil-editor/
+.anvil-secrets/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.python-version
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Build / temp ---
+*.log
+*.tmp
+.firecrawl/

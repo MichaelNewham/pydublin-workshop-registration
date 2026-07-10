@@ -1,0 +1,45 @@
+# Form: RegistrationForm
+container:
+  type: ColumnPanel
+  properties: {col_widths: '{"100":1000}'}
+components:
+  - type: Label
+    name: heading_label
+    properties: {text: 'Register', role: title, bold: true, font_size: 24}
+  - type: Label
+    name: event_title
+    properties: {text: '', italic: true, foreground: '#666', spacing_below: medium}
+  - type: TextBox
+    name: name_box
+    properties: {text: '', placeholder: Your name, spacing_above: small}
+  - type: TextBox
+    name: email_box
+    properties: {text: '', placeholder: email@example.com}
+  - type: TextBox
+    name: phone_box
+    properties: {text: '', placeholder: '+353 ...'}
+  - type: TextBox
+    name: company_box
+    properties: {text: '', placeholder: 'Company (optional)'}
+  - type: TextArea
+    name: notes_box
+    properties:
+      text: ''
+      placeholder: 'Optional notes (e.g. dietary requirements)'
+      height: 80
+      html_id: notes-field   # the JS character counter in anvil.yaml keys off this id
+  - type: Label
+    name: notes_hint
+    properties: {text: '280 characters left', foreground: '#888', font_size: 12}
+  - type: FlowPanel
+    name: action_row
+    properties: {align: right, spacing_above: medium}
+    components:
+      - type: Button
+        name: back_button
+        properties: {text: 'Back', role: outline}
+        event_bindings: {click: back_button_click}
+      - type: Button
+        name: submit_button
+        properties: {text: 'Submit registration', role: primary, bold: true}
+        event_bindings: {click: submit_button_click}

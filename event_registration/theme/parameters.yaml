@@ -1,0 +1,27 @@
+# =============================================================================
+# parameters.yaml - Form roles + colour scheme for the theme
+# =============================================================================
+# Reference: https://github.com/anvil-works/anvil-runtime/blob/master/doc/app-structure.md
+# Roles declared here are referenced from form_template.yaml via `role: ...`.
+
+roles:
+  - name: title
+    borders: {width: 0}
+  - name: primary
+    background: "#1a7a3a"
+    foreground: "#ffffff"
+    border: null
+  - name: outline
+    background: ""
+    foreground: "#1a1f1a"
+    border: "#d9ddd4"
+  - name: danger
+    background: "#b3261e"
+    foreground: "#ffffff"
+    border: null
+
+colour_scheme:
+  Primary: "#1a7a3a"
+  Secondary: "#f0a500"
+  Background: "#f7f8f5"
+  Foreground: "#1a1f1a"

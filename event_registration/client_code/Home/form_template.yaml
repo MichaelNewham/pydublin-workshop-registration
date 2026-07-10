@@ -1,0 +1,74 @@
+# Form: Home
+# Container: ColumnPanel (full-width vertical stack)
+container:
+  type: ColumnPanel
+  properties: {col_widths: '{}'}
+components:
+  - type: Label
+    name: title_label
+    properties:
+      text: Loading...
+      role: title
+      bold: true
+      font_size: 28
+      spacing_above: large
+      spacing_below: small
+  - type: Label
+    name: date_label
+    properties:
+      text: ''
+      italic: true
+      foreground: '#666'
+      spacing_above: none
+      spacing_below: none
+  - type: Label
+    name: location_label
+    properties:
+      text: ''
+      italic: true
+      foreground: '#666'
+      spacing_above: none
+      spacing_below: small
+  - type: Label
+    name: description_label
+    properties:
+      text: ''
+      spacing_above: small
+      spacing_below: small
+  - type: Label
+    name: price_label
+    properties:
+      text: ''
+      bold: true
+      foreground: '#1a7a3a'
+      spacing_above: small
+      spacing_below: none
+  - type: Label
+    name: capacity_label
+    properties:
+      text: ''
+      spacing_above: none
+      spacing_below: large
+  # Action row
+  - type: FlowPanel
+    name: action_row
+    properties: {align: center, spacing_above: medium, spacing_below: large}
+    components:
+      - type: Button
+        name: register_button
+        properties:
+          text: Register now
+          role: primary
+          bold: true
+        event_bindings: {click: register_button_click}
+      - type: Button
+        name: view_participants_button
+        properties:
+          text: View participants (organiser)
+        event_bindings: {click: view_participants_button_click}
+      - type: Button
+        name: copy_ref_button
+        properties:
+          text: Copy event ref to clipboard
+          role: outline
+        event_bindings: {click: copy_ref_button_click}
