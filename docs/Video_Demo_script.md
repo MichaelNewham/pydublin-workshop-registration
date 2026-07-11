@@ -3,10 +3,11 @@
 > Target length: 5–6 minutes. Each shot has a suggested on-screen caption and
 > what the presenter says. Record in one take per shot, then edit together.
 
-## 0:00–0:30 — The problem (one presenter)
+## 0:00-0:30 - The problem (one presenter)
 
-**On-screen:** Title card "PyDublin Workshop 2026 — Event Registration System,
-Option B."
+**On-screen:** Title card "PyDublin Workshop 2026 - Event Registration System,
+Option A." Then cut to the live home page:
+https://pydublin-workshop-registration.onrender.com
 
 **Say:** A 40-seat Python workshop in Dublin needs a registration tool. Today
 it's run on a spreadsheet sent by email — which causes overbooking, duplicate

@@ -6,6 +6,9 @@ A small web application for event registration, built with **Python + Flask
 Final project for **D4B - Elective 2: Business Programming** (**Option A** -
 Event Registration Web App).
 
+> **Live app:** https://pydublin-workshop-registration.onrender.com
+> (Render free tier - first hit may take up to 50 s to cold-start, then fast.)
+
 > Read [`Project_Overview.md`](Project_Overview.md) and
 > `Project - Business Programming May 2026 - Guidelines.pdf` for the official
 > brief. This README explains how to **run locally**, how to **deploy**, and
@@ -121,6 +124,9 @@ This repo has a `render.yaml`, so deployment is push-to-deploy:
    `https://pydublin-workshop-registration.onrender.com`.
 5. **Every `git push` to `main` triggers an auto-redeploy** - so the tutor
    always sees the latest code.
+
+**The current live deployment**: https://pydublin-workshop-registration.onrender.com
+(auto-synced from `main`; see the Render dashboard for deploy history).
 
 SQLite on Render is ephemeral - the DB resets on each deploy. That's
 intentional for a marking demo (the seed runs fresh each time). For a
