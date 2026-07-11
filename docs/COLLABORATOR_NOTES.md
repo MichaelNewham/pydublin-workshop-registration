@@ -128,29 +128,86 @@ git push             # same branch - the PR updates automatically
 
 ### 🟩 Michael Newham - Block A: Backend & Data (30%)
 
-You own the data model and all server-side logic.
+You own the data model and all server-side logic. **Michael has already done
+one PR** - read this section as a worked example of how his block works in
+practice, not as a TODO list.
 
-**Your files:**
+**Files you own:**
 - `event_registration/models.py` (the `Event` and `Registration` SQLAlchemy classes)
-- `event_registration/routes.py` (the 9 URL routes + validation)
+- `event_registration/routes.py` (every URL route + validation)
 - `event_registration/seed.py` (idempotent first-boot seeding)
 - `event_registration/config.py` (env-driven settings)
 - `event_registration/extensions.py` + `event_registration/__init__.py` (app factory)
+- `event_registration/auth.py` (the shared-password organiser gate)
 
-**Typical tasks:**
-- Add a new column to a model (e.g. "dietary requirements" on `Registration`):
-  edit `models.py`, then add the column to the `register.html` form so Sergiu
-  sends it through.
-- Tighten validation in `routes.register` (the function with the `@bp.route`
-  decorator).
-- Add a new route.
+### Worked example: PR #1 (merged 11 July 2026)
 
-**Workflow tips:**
-- After editing models, **delete `event_registration/app.db`** locally to let
-  the schema rebuild itself - we don't run migrations for this demo.
-- Run the smoke test before pushing: open the Python REPL and
-  `from event_registration import create_app; app = create_app();
-  c = app.test_client(); print(c.get('/').status_code)` should print `200`.
+Michael's first change was a real fix prompted by a design review: the
+organiser-only Participants list was reachable from a public button on the
+home page, exposing attendee names, emails, phones, and notes to anyone on
+the internet. He turned it into a PR. Real steps:
+
+1. Set local git identity (so commits come out under his name):
+   ```bash
+   git config user.name  "Michael Newham"
+   git config user.email "261012020@digital4business.eu"
+   ```
+
+2. Pulled latest `main` and branched:
+   ```bash
+   git checkout main && git pull
+   git checkout -b michael/organiser-gate-and-cleanup
+   ```
+
+3. Built the fix entirely inside his own block:
+   - New `event_registration/auth.py` - shared-password gate using the
+     `ORGANISER_PASSWORD` env var (default `pydublin-2026`), plus a
+     `@login_required` decorator.
+   - Two new routes in `routes.py`: `GET/POST /login` and `POST /logout`.
+   - Applied `@login_required` to `participants()`, `edit()`, `cancel()`,
+     `restore()`. Left `detail()` public so attendees can still see their
+     own post-register confirmation page.
+   - Cross-block touches (templates + CSS + JS) were coordinated via PR -
+     not bypassed - because they live in other people's blocks.
+
+4. Pushed the branch and opened the PR:
+   ```bash
+   git push -u origin michael/organiser-gate-and-cleanup
+   gh pr create --title "fix(ui+auth): gate organiser routes + remove clipboard" --body "..."
+   ```
+
+5. **CI caught a regression** - the smoke test asserted `GET /participants`
+   would return 200, but the new gate correctly returns 302. Michael
+   didn't argue with the assertion; he updated `ci.yml` to authenticate
+   against the gate before checking the route, plus added wrong-password
+   + logout cases. Pushed the fix. CI went green.
+
+6. Merged PR #1 on GitHub. Render auto-deployed in 54 seconds. Michael
+   verified the fix on the live URL via curl (anonymous `/participants`
+   → 302 to `/login`; authed → 200).
+
+Read the full PR (diff + discussion + CI run) at:
+https://github.com/MichaelNewham/pydublin-workshop-registration/pull/1
+
+### Tips for next time Michael opens a PR
+
+- For route changes that affect gated pages, also update the CI smoke
+  test in `.github/workflows/ci.yml` in the same commit - it'll save you
+  the "CI red on first push" round-trip.
+- After editing `models.py`, delete `event_registration/app.db` locally
+  so the schema rebuilds itself on next boot (we don't run Alembic).
+- After deploying, verify on the live URL (`https://pydublin-workshop-registration.onrender.com`)
+  in a private browser tab - the cookie state there can surprise you.
+- Smoke test before pushing:
+  ```bash
+  python -c "
+  from event_registration import create_app
+  app = create_app()
+  c = app.test_client()
+  assert c.get('/').status_code == 200
+  print('OK')
+  "
+  ```
 
 ---
 
