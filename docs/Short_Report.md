@@ -10,7 +10,7 @@
 
 - **Project title:** PyDublin Workshop 2026 — Event Registration System
 - **Course:** D4B — Elective 2: Business Programming
-- **Option:** B — Low-Code / No-Code Business App
+- **Option:** A - Event Registration Web App
 - **Group members:**
   - Michael Newham (261012020) - Block A: Backend & Data (30%)
   - Sergiu D (261024894) - Block B: Client Forms (25%)
@@ -39,9 +39,10 @@ overbookings, and lost edits were common.
 
 *~1 page*
 
-A low-code app built with **Anvil** (pure Python front-end and back-end).
-The app is a single deployment unit (no separate API server to maintain), and
-all logic lives in version-controlled Python + YAML files.
+A web app built with **Python + Flask + SQLAlchemy + SQLite**, with Jinja2
+templates, plain CSS, and a small vanilla-JS interaction. The whole project is
+version-controlled in git and auto-deploys to Render on every push, so the
+tutor gets a stable public URL with zero human steps after the initial setup.
 
 [TODO: insert architecture diagram/screenshot]
 
@@ -54,18 +55,18 @@ all logic lives in version-controlled Python + YAML files.
 
 *~1.5 pages*
 
-| Feature                                    | Where                                               |
+| Feature                                    | Where (Flask)                                       |
 |--------------------------------------------|-----------------------------------------------------|
-| Event information page                     | `client_code/Home/`                                 |
-| Registration form with server validation   | `client_code/RegistrationForm/` + `create_registration()` |
-| Participant list (auto-updating)           | `client_code/ParticipantsListForm/`                 |
-| Detail page per registration               | `client_code/RegistrationDetailForm/`               |
-| Edit registration                          | `client_code/EditRegistrationForm/` + `update_registration()` |
-| Cancel / restore registration (soft-delete)| `cancel_registration()` / `restore_registration()`  |
-| Two related Data Tables (`Event`↔`Registration`) | `anvil.yaml` → `db_schema`               |
-| Capacity + duplicate-email enforcement     | `create_registration()` in `ServerModule1.py`       |
-| HTML / CSS styling                          | `theme/assets/standard-page.html` + `theme.css`     |
-| JavaScript interaction (clipboard + char counter) | `native_deps.head_html` in `anvil.yaml`      |
+| Event information page                     | route `GET /` in `routes.py` -> `templates/home.html` |
+| Registration form with server validation   | `GET/POST /register` in `routes.py` -> `templates/register.html` |
+| Participant list (auto-updating)           | `GET /participants` -> `templates/participants.html` |
+| Detail page per registration               | `GET /registration/<id>` -> `templates/detail.html` |
+| Edit registration                          | `GET/POST /registration/<id>/edit` -> `templates/edit.html` |
+| Cancel / restore registration (soft-delete)| `POST /registration/<id>/cancel` and `/restore` |
+| Two related tables (`Event` < `Registration`) | `models.py`: `Event` + `Registration` with FK   |
+| Capacity + duplicate-email enforcement     | `register()` in `routes.py` (SQLAlchemy queries)    |
+| HTML / CSS styling                          | `templates/base.html` + `static/css/styles.css` |
+| JavaScript interaction (clipboard + char counter) | `static/js/app.js`                             |
 
 [TODO: 2–3 annotated screenshots of each major screen]
 
@@ -73,19 +74,20 @@ all logic lives in version-controlled Python + YAML files.
 
 *~½ page*
 
-- **Anvil** — low-code Python web app platform (front-end + back-end + Data
-  Tables in one tool)
-- **Python 3** — only language used (per the course's Python focus)
-- **SQLite** — under the hood of Anvil Data Tables
-- **YAML** — config (`anvil.yaml`, `parameters.yaml`)
-- **Standard HTML / CSS / JS** — the theme shell (`standard-page.html`,
-  `theme.css`, the inline `<script>` namespace)
-- **Git** — version control and team collaboration
+- **Python 3** (3.11+) - the language for both back-end (Flask routes, models)
+  and the small client-side JS.
+- **Flask** - lightweight WSGI web framework (used in Week 6 of the course).
+- **SQLAlchemy** - ORM; declares the two models and their relationship.
+- **SQLite** - the database file (`app.db`), created automatically on first run.
+- **Jinja2** - HTML templates (ships with Flask).
+- **Plain HTML / CSS / vanilla JavaScript** - no external front-end libraries.
+- **Git + GitHub** - version control and team collaboration.
 
-# Tools for the project itself:
+Tools for the project itself:
 
-- **GitHub Copilot** — AI pair-programming (see `AI_USE_STATEMENT.md`)
-- **Docker** — local run via `anvil/anvil-app-server`
+- **GitHub Copilot** - AI pair-programming (see `AI_USE_STATEMENT.md`)
+- **Render.com** - push-to-deploy hosting (free tier).
+- **GitHub Actions** - CI: compile + boot-test on every PR.
 
 ## 5. Database schema
 
@@ -103,7 +105,8 @@ Event (1) ──────< Registration (N)
                           `status` (registered / cancelled), `created_at`,
                           `event_id` (FK → Event)
 
-Both are declared in `event_registration/anvil.yaml` under `db_schema:`.
+Both are declared as SQLAlchemy models in `event_registration/models.py`: `Event`
+has a `registrations` relationship; `Registration.event_id` is the foreign key.
 
 ## 6. Testing evidence
 
@@ -131,7 +134,7 @@ We tested each user journey by hand. Log of accepted scenarios:
 *~½ page*
 
 - **No authentication** — anyone with the URL can currently see the participant
-  list. Future: use Anvil's built-in Users service for organiser accounts.
+  list. Future: use Flask-Login for proper organiser accounts.
 - **Single event** — the demo seeds one Event row; multi-event would just need
   a list-detail UI on top of the same schema.
 - **No payment** — `price` is informational; future: integrate Stripe via Anvil's
@@ -155,6 +158,9 @@ JS hook. All code was reviewed and tested by the team before submission.
 See [`README.md`](README.md) for full instructions. TL;DR:
 
 ```bash
-docker run --rm -it -p 3030:3030 -v "$PWD:/app" -w /app anvil/anvil-app-server
-# open http://localhost:3030
+pip install -r requirements.txt
+python run.py
+# open http://localhost:5000
 ```
+
+Or on Render: `git push` to `main` triggers auto-deploy via the `render.yaml`.

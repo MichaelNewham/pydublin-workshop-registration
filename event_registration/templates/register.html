@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="form-card">
+  <h1 class="page-title">Register for {{ event.title }}</h1>
+
+  <form method="POST" action="{{ url_for('routes.register') }}" novalidate>
+    <div class="field">
+      <label for="name">Name *</label>
+      <input type="text" id="name" name="name"
+             value="{{ form.name if form else '' }}"
+             required maxlength="200" />
+    </div>
+
+    <div class="field">
+      <label for="email">Email *</label>
+      <input type="email" id="email" name="email"
+             value="{{ form.email if form else '' }}"
+             required maxlength="200" />
+    </div>
+
+    <div class="field">
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone"
+             value="{{ form.phone if form else '' }}"
+             maxlength="50" />
+    </div>
+
+    <div class="field">
+      <label for="company">Company (optional)</label>
+      <input type="text" id="company" name="company"
+             value="{{ form.company if form else '' }}"
+             maxlength="200" />
+    </div>
+
+    <div class="field">
+      <label for="notes">Notes (dietary requirements, accessibility, etc.)</label>
+      <textarea id="notes" name="notes" rows="4"
+                maxlength="280"
+                placeholder="Optional notes (up to 280 characters)">{% if form %}{{ form.notes }}{% endif %}</textarea>
+      <p class="field-hint js-notes-counter">280 characters left</p>
+    </div>
+
+    <div class="action-row">
+      <a href="{{ url_for('routes.home') }}" class="btn btn-outline">Back</a>
+      <button type="submit" class="btn btn-primary">Submit registration</button>
+    </div>
+  </form>
+</section>
+
+{% endblock %}

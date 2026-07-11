@@ -1,0 +1,258 @@
+/* =============================================================================
+   event_registration/static/css/styles.css
+   =============================================================================
+   Migrated directly from the Anvil theme.css. Satisfies the Option A
+   requirement: "basic HTML/CSS styling".
+   ========================================================================== */
+
+:root {
+  --brand: #1a7a3a;
+  --brand-dark: #0f5526;
+  --accent: #f0a500;
+  --bg: #f7f8f5;
+  --surface: #ffffff;
+  --border: #d9ddd4;
+  --text: #1a1f1a;
+  --text-muted: #5a6258;
+  --danger: #b3261e;
+  --radius: 6px;
+  --shadow: 0 1px 2px rgba(26, 31, 26, 0.06);
+  --font: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* --- Header ------------------------------------------------------------ */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.brand-mark {
+  display: inline-block;
+  background: var(--brand);
+  color: var(--surface);
+  padding: 2px 7px;
+  border-radius: var(--radius);
+  margin-right: 3px;
+}
+.site-nav a {
+  margin-left: 18px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+.site-nav a:hover { color: var(--brand); }
+
+/* --- Layout ------------------------------------------------------------ */
+.content {
+  max-width: 920px;
+  margin: 32px auto 56px;
+  padding: 0 24px;
+}
+
+/* --- Headings & text --------------------------------------------------- */
+.page-title, .event-title {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--brand-dark);
+  margin: 0 0 4px;
+}
+.event-title { font-size: 28px; }
+.page-title  { font-size: 22px; }
+
+.meta-line {
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 2px 0;
+}
+.meta-price { color: var(--brand); font-weight: 700; font-style: normal; }
+.meta-capacity.is-sold-out { color: var(--danger); font-weight: 700; font-style: normal; }
+
+.event-description { margin-top: 16px; }
+
+/* --- Cards ------------------------------------------------------------- */
+.event-card, .form-card, .list-card, .detail-card, .error-card {
+  background: var(--surface);
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* --- Form fields ------------------------------------------------------- */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.field input, .field textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font: inherit;
+  color: inherit;
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.field input:focus, .field textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(26, 122, 58, 0.18);
+}
+.field textarea { resize: vertical; min-height: 80px; font-family: var(--font); }
+.field-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Buttons ----------------------------------------------------------- */
+.btn {
+  cursor: pointer;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.12s ease, transform 0.05s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  background: var(--brand);
+  color: var(--surface);
+}
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); }
+.btn-danger { background: var(--danger); color: var(--surface); }
+.btn-danger:hover { filter: brightness(0.9); }
+.btn-default { background: var(--surface); border-color: var(--border); color: var(--text); }
+.btn-small { padding: 3px 10px; font-size: 13px; }
+
+/* --- Action row -------------------------------------------------------- */
+.action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 24px;
+}
+
+/* --- Flash messages ---------------------------------------------------- */
+.flash-area {
+  max-width: 920px;
+  margin: 16px auto 0;
+  padding: 0 24px;
+}
+.flash {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.flash-success { background: #def5e2; color: var(--brand-dark); }
+.flash-danger  { background: #fae3e1; color: var(--danger); }
+.flash-warning { background: #fff2cc; color: #996b00; }
+
+/* --- Participants table ------------------------------------------------ */
+.participants-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+.participants-table th, .participants-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.participants-table th {
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.participants-table tbody tr:hover { background: rgba(26, 122, 58, 0.04); }
+.mono { font-family: 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; }
+
+/* --- Detail <dl> ------------------------------------------------------- */
+.kv {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 16px 0;
+}
+.kv > div { display: flex; gap: 12px; padding: 6px 0; border-bottom: 1px dotted var(--border); }
+.kv dt { width: 140px; font-weight: 700; color: var(--text-muted); margin: 0; }
+.kv dd { margin: 0; flex: 1; }
+
+.status-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.status-ok { background: #def5e2; color: var(--brand-dark); }
+.status-cancelled { background: #fae3e1; color: var(--danger); }
+
+/* --- Empty state ------------------------------------------------------- */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+}
+
+/* --- Footer ------------------------------------------------------------ */
+.site-footer {
+  margin-top: 48px;
+  padding: 18px 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* --- Responsive -------------------------------------------------------- */
+@media (max-width: 640px) {
+  .site-header { flex-direction: column; gap: 8px; }
+  .site-nav a { margin: 0 8px; }
+  .kv > div { flex-direction: column; gap: 0; }
+  .kv dt { width: auto; }
+  .participants-table { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

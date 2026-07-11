@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if event %}
+<section class="event-card">
+  <h1 class="event-title">{{ event.title }}</h1>
+
+  <div class="event-meta">
+    {% if event.date %}
+      <p class="meta-line">
+        <strong>When:</strong> {{ event.date.strftime('%A %d %B %Y, %H:%M') }}
+      </p>
+    {% endif %}
+    {% if event.location %}
+      <p class="meta-line">
+        <strong>Where:</strong> {{ event.location }}
+      </p>
+    {% endif %}
+    <p class="meta-line meta-price">
+      {% if event.price and event.price > 0 %}
+        <strong>Price:</strong> &euro;{{ "%.2f"|format(event.price) }}
+      {% else %}
+        <strong>Price:</strong> Free
+      {% endif %}
+    </p>
+    <p class="meta-line meta-capacity
+       {% if seats_remaining == 0 %}is-sold-out{% endif %}">
+      <strong>Seats remaining:</strong>
+      {{ seats_remaining }} / {{ event.capacity }}
+      {% if seats_taken %}( {{ seats_taken }} registered ){% endif %}
+    </p>
+  </div>
+
+  {% if event.description %}
+    <p class="event-description">{{ event.description }}</p>
+  {% endif %}
+
+  <div class="action-row">
+    {% if seats_remaining > 0 %}
+      <a class="btn btn-primary" href="{{ url_for('routes.register') }}">
+        Register now
+      </a>
+    {% else %}
+      <button class="btn btn-primary" disabled>Sold out</button>
+    {% endif %}
+    <a class="btn btn-outline"
+       href="{{ url_for('routes.participants') }}">
+      View participants (organiser)
+    </a>
+    <button type="button"
+            class="btn btn-outline js-copy-ref"
+            data-ref="PYDUB-2026">Copy event ref to clipboard</button>
+  </div>
+</section>
+{% else %}
+<div class="empty-state">
+  <h1>No event configured</h1>
+  <p>The database has no Event yet. Run <code>flask seed</code> or check the logs.</p>
+</div>
+{% endif %}
+
+{% endblock %}

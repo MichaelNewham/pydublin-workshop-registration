@@ -1,0 +1,22 @@
+# Render deployment config.
+# Docs: https://render.com/docs/blueprint-spec
+# Once this is committed, either:
+#   1. Go to render.com -> New -> Blueprint -> pick this repo, OR
+#   2. Go to render.com -> New -> Web Service -> pick this repo (auto-detects).
+# Render reads render.yaml and deploys the app for you, no wizard clicks.
+
+services:
+  - type: web
+    name: pydublin-workshop-registration
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn run:app"
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true   # Render creates a random secret on first deploy
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: PYTHON_VERSION
+        value: "3.11.9"

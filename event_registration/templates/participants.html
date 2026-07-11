@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="list-card">
+  <header class="list-header">
+    <h1 class="page-title">Participants</h1>
+    <p class="meta-line">{{ count }} registered
+      {% if event %} for {{ event.title }}{% endif %}</p>
+  </header>
+
+  {% if registrations %}
+  <table class="participants-table">
+    <thead>
+      <tr>
+        <th>Ref</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Company</th>
+        <th>Registered</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in registrations %}
+      <tr>
+        <td class="mono">{{ r.ref }}</td>
+        <td>{{ r.name }}</td>
+        <td>{{ r.email }}</td>
+        <td>{{ r.company or '-' }}</td>
+        <td>{{ r.created_at.strftime('%d %b %Y, %H:%M') if r.created_at else '-' }}</td>
+        <td><a class="btn btn-small btn-outline"
+               href="{{ url_for('routes.detail', reg_id=r.id) }}">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <p>No registrations yet. <a href="{{ url_for('routes.register') }}">Be the first!</a></p>
+  </div>
+  {% endif %}
+
+  <div class="action-row">
+    <a href="{{ url_for('routes.home') }}" class="btn btn-outline">Back to event</a>
+  </div>
+</section>
+
+{% endblock %}

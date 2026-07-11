@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="detail-card">
+  <header>
+    <h1 class="page-title">{{ reg.name }}</h1>
+    <p class="meta-line mono">Ref: {{ reg.ref }}</p>
+  </header>
+
+  <dl class="kv">
+    <div><dt>Email</dt><dd>{{ reg.email }}</dd></div>
+    <div><dt>Phone</dt><dd>{{ reg.phone or '-' }}</dd></div>
+    <div><dt>Company</dt><dd>{{ reg.company or '-' }}</dd></div>
+    <div><dt>Registered at</dt>
+         <dd>{{ reg.created_at.strftime('%d %b %Y, %H:%M') if reg.created_at else '-' }}</dd></div>
+    <div><dt>Status</dt>
+         <dd>
+           <span class="status-pill
+             {% if reg.status == 'registered' %}status-ok{% else %}status-cancelled{% endif %}">
+             {{ reg.status|title }}
+           </span>
+         </dd></div>
+    <div><dt>Notes</dt><dd>{{ reg.notes or '(no notes)' }}</dd></div>
+  </dl>
+
+  <div class="action-row">
+    <a href="{{ url_for('routes.participants') }}" class="btn btn-outline">Back to list</a>
+
+    {% if reg.status == 'registered' %}
+      <a href="{{ url_for('routes.edit', reg_id=reg.id) }}" class="btn btn-default">Edit</a>
+
+      <form method="POST" action="{{ url_for('routes.cancel', reg_id=reg.id) }}"
+            onsubmit="return confirm('Cancel this registration?');" style="display:inline">
+        <button type="submit" class="btn btn-danger">Cancel registration</button>
+      </form>
+    {% else %}
+      <form method="POST" action="{{ url_for('routes.restore', reg_id=reg.id) }}"
+            style="display:inline">
+        <button type="submit" class="btn btn-primary">Restore registration</button>
+      </form>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

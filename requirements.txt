@@ -1,0 +1,10 @@
+# Web framework + ORM
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.30
+
+# Production WSGI server (used by Render)
+gunicorn==22.0.0
+
+# Optional - for the future Postgres backend
+# psycopg2-binary==2.9.9
