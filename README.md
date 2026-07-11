@@ -173,6 +173,9 @@ integration/PM 20%):
 A is the only hard prerequisite (B's templates need A's routes). C is fully
 parallel. See `docs/Individual_Contribution.csv` for the canonical split.
 
+> **New to the project?** The per-student setup guide + tasks per block is in
+> [`docs/COLLABORATOR_NOTES.md`](docs/COLLABORATOR_NOTES.md).
+
 ---
 
 ## Mapping to course requirements (Option A deliverables)
