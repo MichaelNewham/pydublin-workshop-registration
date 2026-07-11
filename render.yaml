@@ -11,7 +11,10 @@ services:
     runtime: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn run:app"
+    # IMPORTANT: when you specify startCommand, Render does NOT auto-inject
+    # the bind flags. Explicitly bind to 0.0.0.0:$PORT so Render's router
+    # can reach gunicorn.
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 60 run:app"
     autoDeploy: true
     envVars:
       - key: SECRET_KEY
