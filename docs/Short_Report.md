@@ -47,6 +47,21 @@ tutor gets a stable public URL with zero human steps after the initial setup.
 
 [TODO: insert architecture diagram/screenshot]
 
+### Team workflow
+
+Coordination happened via **feature branches + pull requests** against the
+`main` branch on GitHub. Each contributor worked on a branch named
+`<owner>/<change>` (e.g. `sergiu/improve-home-layout`) and opened a PR.
+Every push - to a branch or to `main` - triggered a GitHub Actions workflow
+(`lint-and-boot` job) that installs dependencies, compile-checks every Python
+file with `python -m compileall`, runs a focused `flake8` pass for syntax
+and undefined-name errors, then boots the app via its `create_app()` factory
+and smoke-tests the `/`, `/register`, and `/participants` routes. Only PRs
+with a green CI tick were merged. On merge to `main`, Render's Blueprint
+pipeline rebuilt and redeployed the public URL automatically - so the tutor
+always sees a version of the app that has passed both peer review and
+automated checks.
+
 ### User journeys
 
 - **Attendee:** Home → Register → submit → confirmation ref
