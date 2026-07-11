@@ -40,8 +40,12 @@ def create_app(config_class=Config):
 
     @app.context_processor
     def inject_globals():
-        """Make the event title available in every template."""
+        """Make the site title + organiser flag available in every template."""
+        from .auth import is_organiser  # local import to avoid circular at boot
         event = Event.query.first()
-        return {"site_title": (event.title if event else "Event Registration")}
+        return {
+            "site_title": (event.title if event else "Event Registration"),
+            "is_organiser": is_organiser(),
+        }
 
     return app

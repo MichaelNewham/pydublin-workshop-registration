@@ -31,7 +31,19 @@ it must be explained." This statement is also mirrored in the final report's
 
 ## What the group corrected or rejected
 
-- **Validation rules** — the AI's first draft of `create_registration` did not
+- **Public participant list (privacy fix)** - the AI's initial scaffold
+  exposed the organiser-only participants page via a public "View
+  participants" button on the home page and a top-nav link. The team
+  identified this as a data-protection issue (attendee names, emails,
+  phone numbers, and accessibility notes would be publicly scrapable)
+  and corrected it by adding a shared-password gate (`event_registration/auth.py`
+  + `/login` route) and removing the public links.
+- **Removal of the redundant clipboard button** - the AI scaffold added
+  a "Copy event ref to clipboard" button on the home page. The team
+  reviewed the brief, saw that only one JavaScript interaction is
+  required and that the live character counter already satisfies it,
+  and removed the clipboard button as over-extrapolation beyond scope.
+- **Validation rules** - the AI's first draft of `create_registration` did not
   catch duplicate emails or sold-out events; the team added those checks
   explicitly after writing test cases.
 - **JS interaction** — the AI initially proposed a jQuery clipboard library;

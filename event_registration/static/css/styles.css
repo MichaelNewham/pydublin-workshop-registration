@@ -160,6 +160,20 @@ html, body {
 .btn-default { background: var(--surface); border-color: var(--border); color: var(--text); }
 .btn-small { padding: 3px 10px; font-size: 13px; }
 
+/* Inline sign-out (nav) - looks like a link, behaves like a form button */
+.btn-link {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 18px;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+}
+.btn-link:hover { color: var(--brand); }
+
 /* --- Action row -------------------------------------------------------- */
 .action-row {
   display: flex;

@@ -4,15 +4,24 @@ event_registration.routes
 
 All HTTP routes. Implements every Option A functional requirement:
 
-    GET  /                           event information page
-    GET  /register                   registration form
+    GET  /                           event information page (public)
+    GET  /register                   registration form (public)
     POST /register                   create registration  (with validation)
-    GET  /participants               list of registered participants (organiser)
-    GET  /registration/<id>          detail page for each registration
-    GET  /registration/<id>/edit     edit form
-    POST /registration/<id>/edit     save edits
-    POST /registration/<id>/cancel   cancel a registration (soft delete)
-    POST /registration/<id>/restore  restore a cancelled registration
+    GET  /registration/<id>          detail page for each registration (public;
+                                     attendees see their own confirmation here)
+    GET  /login                      shared-password organiser sign-in
+    POST /login                      validate + set session flag
+    GET  /logout                     clear session, return home
+    GET  /participants               list (organiser-only)
+    GET  /registration/<id>/edit     edit form (organiser-only)
+    POST /registration/<id>/edit     save edits (organiser-only)
+    POST /registration/<id>/cancel   cancel a registration (soft delete, organiser-only)
+    POST /registration/<id>/restore  restore a cancelled registration (organiser-only)
+
+Design: the server-side organiser tools are gated by `@login_required`,
+which checks a shared-password session flag (see auth.py). This keeps
+attendee contact details off the public internet while staying inside
+the brief's scope (no per-user accounts).
 
 Business rules carried over verbatim from the Anvil version:
   -> capacity check (cannot overbook)
@@ -21,10 +30,11 @@ Business rules carried over verbatim from the Anvil version:
 """
 
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, request, flash, abort
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, session
 
 from .extensions import db
 from .models import Event, Registration
+from .auth import login_required, is_organiser, ORGANISER_PASSWORD, _safe_eq
 
 bp = Blueprint("routes", __name__)
 
@@ -105,9 +115,35 @@ def register():
 
 
 # =============================================================================
-# Organiser routes
+# Organiser auth (shared-password gate; see auth.py)
+# =============================================================================
+@bp.route("/login", methods=["GET", "POST"])
+def login():
+    """Shared-password organiser login."""
+    if request.method == "POST":
+        submitted = request.form.get("password", "")
+        if _safe_eq(submitted, ORGANISER_PASSWORD):
+            session["is_organiser"] = True
+            flash("Signed in as organiser.", "success")
+            next_url = session.pop("next_url", None) or url_for("routes.participants")
+            return redirect(next_url)
+        flash("Incorrect password.", "danger")
+    return render_template("login.html")
+
+
+@bp.route("/logout", methods=["POST"])
+def logout():
+    """Clear the organiser session flag."""
+    session.pop("is_organiser", None)
+    flash("Signed out.", "info")
+    return redirect(url_for("routes.home"))
+
+
+# =============================================================================
+# Organiser routes (gated by @login_required)
 # =============================================================================
 @bp.route("/participants")
+@login_required
 def participants():
     """List of registered participants for the organiser."""
     event = _get_demo_event()
@@ -126,14 +162,19 @@ def participants():
 
 @bp.route("/registration/<int:reg_id>")
 def detail(reg_id):
-    """Detail page for a single registration."""
+    """Detail page for a single registration.
+
+    Stays PUBLIC: attendees are redirected here after they register so they
+    can see their own confirmation + ref. There is no per-attendee login.
+    """
     reg = db.session.get(Registration, reg_id) or abort(404)
     return render_template("detail.html", reg=reg)
 
 
 @bp.route("/registration/<int:reg_id>/edit", methods=["GET", "POST"])
+@login_required
 def edit(reg_id):
-    """Edit an existing registration."""
+    """Edit an existing registration (organiser-only)."""
     reg = db.session.get(Registration, reg_id) or abort(404)
 
     if request.method == "POST":
@@ -150,8 +191,9 @@ def edit(reg_id):
 
 
 @bp.route("/registration/<int:reg_id>/cancel", methods=["POST"])
+@login_required
 def cancel(reg_id):
-    """Soft-delete: mark a Registration as 'cancelled'."""
+    """Soft-delete: mark a Registration as 'cancelled' (organiser-only)."""
     reg = db.session.get(Registration, reg_id) or abort(404)
     reg.status = "cancelled"
     db.session.commit()
@@ -160,8 +202,9 @@ def cancel(reg_id):
 
 
 @bp.route("/registration/<int:reg_id>/restore", methods=["POST"])
+@login_required
 def restore(reg_id):
-    """Restore a previously cancelled registration."""
+    """Restore a previously cancelled registration (organiser-only)."""
     reg = db.session.get(Registration, reg_id) or abort(404)
     reg.status = "registered"
     db.session.commit()

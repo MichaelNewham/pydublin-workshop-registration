@@ -28,8 +28,13 @@ A simple but complete event-registration tool for a small workshop:
 - **Two related database tables** - `Event` `<` `Registration` with a
   foreign key (1-to-many)
 - **HTML / CSS styling** - custom stylesheet, responsive, accessible
-- **Two JavaScript interactions** - copy-to-clipboard of the event ref,
-  and a live character counter on the notes field (`static/js/app.js`)
+- **One JavaScript interaction** - a live character counter on the notes
+  field (`static/js/app.js`), so the user knows when they have hit the 280-
+  character limit. Pure vanilla JS, no libraries.
+- **Shared-password organiser gate** - the participants list and the
+  edit/cancel/restore endpoints are gated behind a single shared password
+  (`/login`) so attendee data is not publicly scrapable. The registration
+  flow and the attendee's own detail page stay public.
 
 ## Tech stack
 
@@ -77,7 +82,7 @@ Project/
 |  |  |- participants.html, detail.html, edit.html, error.html
 |  |- static/
 |     |- css/styles.css            <- all styling (Block C)
-|     |- js/app.js                 <- the JS interactions (Block C)
+|     |- js/app.js                 <- the JavaScript interaction - char counter (Block C)
 |
 |- data/seed_events.csv            <- matches the seed_demo_data() in code
 |- docs/                           <- report, video script, contribution csv
@@ -143,8 +148,7 @@ production build, swap `DATABASE_URL` to a Render Postgres instance.
 | Event type         | Workshop                                             |
 | Event name         | PyDublin Workshop 2026 - Python for Business         |
 | Registration fields| name, email, phone, company, notes                   |
-| Login              | None (deferred to future improvements in the report) |
-| Team (blocks)      | See `AUTHORS.md` and table below                     |
+| Organiser gate      | Shared password at `/login` (env: `ORGANISER_PASSWORD`)   |
 | Git remote         | `MichaelNewham/pydublin-workshop-registration` (public) |
 
 ---
@@ -189,7 +193,7 @@ parallel. See `docs/Individual_Contribution.csv` for the canonical split.
 | Detail page for each registration      | `routes.detail` -> `templates/detail.html`          |
 | Edit or cancel a registration          | `routes.edit` / `routes.cancel` / `routes.restore`  |
 | Basic HTML/CSS styling                 | `templates/base.html` + `static/css/styles.css`     |
-| At least one simple JavaScript interaction | `static/js/app.js` (clipboard + char counter)    |
+| At least one simple JavaScript interaction | `static/js/app.js` (live character counter) |
 | Two related tables                     | `Registration.event_id` -> `Event.id` (FK)          |
 | README                                 | this file                                           |
 | AI-use statement                       | `docs/AI_USE_STATEMENT.md` (linked from the report) |
