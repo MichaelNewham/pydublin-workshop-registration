@@ -1,0 +1,56 @@
+#_CI: lint + boot-test on every push and PR. Catches broken Python / YAML
+# before it lands on main, so Render can deploy cleanly.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-boot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+
+      - name: Compile-check all Python files
+        run: |
+          # Fail on syntax errors; bail out on import surprises.
+          python -m compileall -q event_registration run.py
+
+      - name: Flake8 (style only, stop on serious issues)
+        run: flake8 event_registration run.py --max-line-length=100 --select=E9,F63,F7,F82 --statistics
+
+      - name: Boot test (app factory works + routes register)
+        env:
+          SECRET_KEY: ci-test-secret
+          FLASK_DEBUG: '1'
+        run: |
+          python - <<'PY'
+          from event_registration import create_app
+          app = create_app()
+          client = app.test_client()
+          # Home route must return 200
+          r = client.get('/')
+          assert r.status_code == 200, f"home returned {r.status_code}"
+          # Registration GET must return 200
+          r = client.get('/register')
+          assert r.status_code == 200, f"register GET returned {r.status_code}"
+          # Participants list must return 200
+          r = client.get('/participants')
+          assert r.status_code == 200, f"participants returned {r.status_code}"
+          print("All smoke tests passed.")
+          PY
