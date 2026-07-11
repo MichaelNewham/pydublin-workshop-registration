@@ -113,7 +113,41 @@ has a `registrations` relationship; `Registration.event_id` is the foreign key.
 
 *~1 page*
 
-We tested each user journey by hand. Log of accepted scenarios:
+Testing happens at three layers: (a) automated **CI** on every commit,
+(b) **live smoke tests** against the public Render URL, and (c) **manual
+UI tests** in the browser. All three must pass before a change is merged.
+
+### 6.1 Automated - GitHub Actions CI (runs on every push and PR)
+
+The workflow in `.github/workflows/ci.yml` does, in order:
+
+1. `pip install -r requirements.txt`
+2. `python -m compileall event_registration run.py` (syntax check every `.py`)
+3. `flake8 --select=E9,F63,F7,F82` (catches syntax + undefined-name errors)
+4. Boots the app via `create_app()` and asserts `GET /`, `GET /register`,
+   and `GET /participants` all return 200 (Flask test client).
+
+Run history: https://github.com/MichaelNewham/pydublin-workshop-registration/actions
+Current status as of submission: **all commits on `main` have a green tick**.
+
+### 6.2 Live smoke tests against the Render deployment
+
+These were run against `https://pydublin-workshop-registration.onrender.com`
+with `curl` after the deploy stabilised. They prove the production
+environment (gunicorn + Render free tier) actually serves each route:
+
+| Method + Path                            | Expected                       | Actual            |
+|------------------------------------------|--------------------------------|-------------------|
+| `GET /`                                  | 200 + event title in HTML      | 200, 2453 B       |
+| `GET /register`                          | 200 + submit button present    | 200, 2647 B       |
+| `POST /register` (valid form data)      | 302 -> `/registration/<id>`    | 302 -> `/registration/3` |
+| `GET /participants` after the POST      | New registration appears in list | 1 match for the test email |
+| `GET /registration/99999`               | 404 via custom error handler   | 404               |
+
+### 6.3 Manual UI tests in the browser
+
+Log of accepted scenarios (each ticked after a real click-through on the
+live app):
 
 | # | Scenario                                            | Expected                                   | Pass |
 |---|-----------------------------------------------------|--------------------------------------------|------|
@@ -138,10 +172,11 @@ We tested each user journey by hand. Log of accepted scenarios:
   list. Future: use Flask-Login for proper organiser accounts.
 - **Single event** — the demo seeds one Event row; multi-event would just need
   a list-detail UI on top of the same schema.
-- **No payment** — `price` is informational; future: integrate Stripe via Anvil's
-  HTTP API.
-- **No automated tests** — manual test log only; future: convert §6 into a
-  pytest-driven smoke suite run against the standalone server.
+- **No payment** — `price` is informational; future: integrate Stripe via
+  Flask routes and a hosted checkout.
+- **CI runs light checks only** — GitHub Actions currently does compile,
+  flake8, and a 3-route boot test. Future: convert the manual UI log from
+  §6.3 into a pytest-driven smoke suite so browser flows are covered too.
 
 ## 8. AI-use statement
 

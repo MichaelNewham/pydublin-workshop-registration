@@ -1,53 +1,57 @@
-# CI setup (one-time manual step)
+# CI setup
 
-A GitHub Actions workflow file is checked into `.github/workflows/ci.yml`.
-It runs on every push and pull request, and:
+**Status: live.** The GitHub Actions workflow in `.github/workflows/ci.yml`
+is running on every push and PR to `main`. First passing run: commit
+`d6eaa3f`, 16 seconds, July 11 2026.
+
+Run history: https://github.com/MichaelNewham/pydublin-workshop-registration/actions
+
+## What the workflow does
+
+On every push to `main` and every PR targeting `main`, GitHub provisions a
+fresh Ubuntu + Python 3.11 runner and:
 
 1. Installs dependencies from `requirements.txt`.
 2. Compile-checks every `.py` file (`python -m compileall`).
-3. Runs flake8 for serious issues (E9, F63, F7, F82).
-4. Boots the Flask app via its `create_app()` factory and smoke-tests
-   the `/`, `/register`, and `/participants` routes.
+3. Runs `flake8 --select=E9,F63,F7,F82` (catches the serious stuff only:
+   syntax errors, undefined names, starred-assignment bugs).
+4. Boots the app via its `create_app()` factory and smoke-tests the
+   `/`, `/register`, and `/participants` routes with a Flask test client,
+   asserting each returns 200.
 
-## Why isn't it already running?
+The whole job finishes in ~15-20 seconds.
 
-The deploy token used by `git push` did not have the GitHub `workflow`
-scope, which GitHub requires for any commit that touches files under
-`.github/workflows/`. So the file lives in the repo but is awaiting
-this one-time permission grant.
+## Prerequisites (already satisfied on this repo)
 
-## To enable (takes ~30 seconds)
+- `.github/workflows/ci.yml` must be committed to the default branch.
+- The token used to push it needs the GitHub `workflow` scope. We added
+  this scope to the `MichaelNewham` GitHub account's stored credentials
+  via `gh auth refresh -h github.com -s workflow`.
 
-Choose ONE of the following:
+## Running the workflow locally
 
-### Option A - bump the deploy token scope (recommended)
+Before pushing, you can run the same checks by hand:
 
 ```bash
-gh auth refresh -h github.com -s workflow
-git add .github/workflows/ci.yml
-git commit -m "ci: enable GitHub Actions workflow"
-git push origin main
+pip install -r requirements.txt flake8
+python -m compileall event_registration run.py
+flake8 event_registration run.py --max-line-length=100 --select=E9,F63,F7,F82
+python -c "from event_registration import create_app; \
+  app = create_app(); \
+  c = app.test_client(); \
+  assert c.get('/').status_code == 200; \
+  assert c.get('/register').status_code == 200; \
+  assert c.get('/participants').status_code == 200; \
+  print('OK')"
 ```
 
-After this, every future push and PR will trigger the CI run on GitHub.
+If all three pass locally, CI will almost certainly pass too.
 
-### Option B - paste the file via the web UI
+## If CI fails on a push
 
-1. Open https://github.com/MichaelNewham/pydublin-workshop-registration
-2. Click **Add file -> Create new file**.
-3. Name it `.github/workflows/ci.yml`.
-4. Paste the contents from your local copy at
-   `.github/workflows/ci.yml`.
-5. **Commit changes**.
+Click the red ❌ next to the commit on GitHub, then click the failed step
+for full logs. The most common causes are:
 
-The web UI uses your interactive browser session, so it doesn't need
-the `workflow` scope on a token. The workflow starts running immediately
-on the next push.
-
-### Verify CI is running
-
-After either option:
-
-- Visit the **Actions** tab of the repo on GitHub.
-- You should see a green tick (or yellow in-progress) next to the latest
-  commit on `main`.
+- A syntax error slipped in (the `compileall` step will catch it).
+- A typo'd route name caused a 500 on `/`, `/register`, or `/participants`.
+- An import error (e.g. circular import) - flake8 will report `F401` / `F811`.
