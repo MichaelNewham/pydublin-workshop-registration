@@ -43,6 +43,9 @@ A simple but complete event-registration tool for a small workshop:
 | Deploy     | Render via `render.yaml` (push-to-deploy)               |
 | CI         | GitHub Actions (`.github/workflows/ci.yml`)             |
 
+> **CI note:** the workflow file lives in the repo but needs a one-time
+> permission grant to start running. See [`docs/CI_SETUP.md`](docs/CI_SETUP.md).
+
 ---
 
 ## Repository layout
