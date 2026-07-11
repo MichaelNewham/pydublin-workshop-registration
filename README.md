@@ -117,6 +117,48 @@ designer, simultaneous editing, and one-click sharing.
 
 ---
 
+## Live deployment (for the tutor)
+
+Two deployment paths. We use **A** in practice; B is documented for the
+report's "future improvements" section.
+
+### Path A — Anvil cloud (recommended, what we actually use)
+
+1. The repo has been cloned into the Anvil cloud IDE via *File -> Clone from
+   Git* (GitHub: `MichaelNewham/pydublin-workshop-registration`).
+2. In the IDE: **Publishing -> Publish to the web -> Public link**.
+3. Anvil returns a stable URL of the form `https://XXX.anvil.app` set on
+   first publish (it never changes thereafter).
+4. That URL is what the tutor opens to mark the running app; it is also
+   referenced in the demo video.
+
+> Add the publish URL here once known, e.g.:
+> **Live app:** https://PYDUB-WORKSHOP-2026.anvil.app
+
+Auto-sync is enabled in the IDE's *Version Control* panel, so every
+"Publish" also pushes a commit back to this GitHub repo. that means the
+tutor can read the **git history** to see who did what, *and* open
+the **live URL** to see the running result.
+
+### Path B — Self-hosted on Proxmox VE (future improvement)
+
+We document this for completeness but it is **not** used during marking.
+The same `anvil-app-server` Docker image from "How to run" can be hosted
+long-term behind a reverse proxy on a Proxmox VE box at, e.g.,
+`pydublin.michaelnewham.me` (TLS via Let's Encrypt, systemd unit to keep
+it up). The report's "Limitations & future improvements" section calls
+this out as a natural next step beyond the Anvil cloud free tier.
+
+### Why not GitHub Codespaces
+
+Codespaces is great for editing code but a poor fit here: Anvil apps need
+the proprietary Anvil runtime (not just a Flask server), and a Codespaces
+port-forward URL changes every time the codespace restarts - so the tutor
+cannot bookmark a stable link. The Anvil cloud IDE gives the same
+browser-based editing plus a permanent public URL in one step.
+
+---
+
 ## Decisions and assumptions
 
 These are **easy to change** — listed here so nothing is hidden. Open an issue
