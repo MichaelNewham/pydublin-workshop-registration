@@ -87,10 +87,10 @@ checks, duplicate-email checks, cancel/restore — lives in
 
 **On-screen:** Table from `docs/Individual_Contribution.csv`.
 
-- **Michael Newham (Block A):** database schema + server functions + validation.
-- **Sergiu D (Block B):** the five client Forms + form logic + navigation.
-- **Paul Sealy (Block C):** theme - HTML shell + CSS + the JS interaction.
-- **Alessandro Genco (Block D):** docs + test log + report + this video + git integration.
+- **Michael Newham (261012020, Block A):** database schema + server functions + validation.
+- **Sergiu D (261024894, Block B):** the five client Forms + form logic + navigation.
+- **Paul Sealy (261018041, Block C):** theme - HTML shell + CSS + the JS interaction.
+- **Alessandro Genco (262016773, Block D):** docs + test log + report + this video + git integration.
 
 ## 6:30–7:00 — Limitations & wrap
 
@@ -107,6 +107,6 @@ for watching.
 - [ ] Increase browser zoom to ~110% so text is readable.
 - [ ] Use the **Chrome Anvil IDE** for any live editing shots - looks better
       than the local Docker view.
-- [ ] Speakers: **Michael Newham, Sergiu D, Paul Sealy, Alessandro Genco**
+- [ ] Speakers: **Michael Newham (261012020), Sergiu D (261024894), Paul Sealy (261018041), Alessandro Genco (262016773)**
       (watermark each shot with the speaker's name).
 - [ ] Export at 1080p, MP4, H.264.

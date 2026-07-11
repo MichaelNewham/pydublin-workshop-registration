@@ -12,10 +12,10 @@
 - **Course:** D4B — Elective 2: Business Programming
 - **Option:** B — Low-Code / No-Code Business App
 - **Group members:**
-  - Michael Newham - Block A: Backend & Data (30%)
-  - Sergiu D - Block B: Client Forms (25%)
-  - Paul Sealy - Block C: Theme, CSS & JS (25%)
-  - Alessandro Genco - Block D: Docs, Testing & PM (20%)
+  - Michael Newham (261012020) - Block A: Backend & Data (30%)
+  - Sergiu D (261024894) - Block B: Client Forms (25%)
+  - Paul Sealy (261018041) - Block C: Theme, CSS & JS (25%)
+  - Alessandro Genco (262016773) - Block D: Docs, Testing & PM (20%)
 - **Date:** `[TODO submission date]`
 
 ---

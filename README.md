@@ -129,9 +129,11 @@ or edit the relevant file directly if you want to tweak.
 | Event name         | PyDublin Workshop 2026 — Python for Business     | `anvil.yaml` / DB   |
 | Registration fields| name, email, phone, company, notes               | `anvil.yaml` UI     |
 | Login              | (none yet — added as a future improvement)        | n/a                 |
-| Team (blocks)      | Michael Newham (A, 30%), Sergiu D (B, 25%),       | `docs/Individual_Contribution.csv` |
-|                    | Paul Sealy (C, 25%), Alessandro Genco (D, 20%)    |                     |
-| Git remote         | `MichaelNewham/pydublin-workshop-registration`    | `.git/`             |
+| Team (blocks)      | Michael Newham (261012020, A, 30%),                | `docs/Individual_Contribution.csv`, |
+|                    | Sergiu D (261024894, B, 25%),                       | `AUTHORS.md` |
+|                    | Paul Sealy (261018041, C, 25%),                     |                     |
+|                    | Alessandro Genco (262016773, D, 20%)                |                     |
+| Git remote         | `MichaelNewham/pydublin-workshop-registration` (private) | `.git/`        |
 
 ---
 
