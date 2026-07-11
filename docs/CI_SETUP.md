@@ -15,9 +15,13 @@ fresh Ubuntu + Python 3.11 runner and:
 2. Compile-checks every `.py` file (`python -m compileall`).
 3. Runs `flake8 --select=E9,F63,F7,F82` (catches the serious stuff only:
    syntax errors, undefined names, starred-assignment bugs).
-4. Boots the app via its `create_app()` factory and smoke-tests the
-   `/`, `/register`, and `/participants` routes with a Flask test client,
-   asserting each returns 200.
+4. Boots the app via its `create_app()` factory and runs a smoke
+   test covering:
+   - Public `GET /`, `/register`, `/login` return 200.
+   - Unauthenticated `GET /participants` redirects to `/login`.
+   - Wrong password is rejected and the gate stays closed.
+   - Correct password (CI env: `ci-test-pw`) unlocks the gate.
+   - Logout re-locks it.
 
 The whole job finishes in ~15-20 seconds.
 
@@ -36,16 +40,20 @@ Before pushing, you can run the same checks by hand:
 pip install -r requirements.txt flake8
 python -m compileall event_registration run.py
 flake8 event_registration run.py --max-line-length=100 --select=E9,F63,F7,F82
-python -c "from event_registration import create_app; \
-  app = create_app(); \
-  c = app.test_client(); \
-  assert c.get('/').status_code == 200; \
-  assert c.get('/register').status_code == 200; \
-  assert c.get('/participants').status_code == 200; \
-  print('OK')"
+ORGANISER_PASSWORD=local-test python -c "
+from event_registration import create_app
+app = create_app()
+c = app.test_client()
+assert c.get('/').status_code == 200
+assert c.get('/register').status_code == 200
+assert c.get('/participants').status_code == 302   # gate closed (unauth)
+assert c.post('/login', data={'password':'local-test'}).status_code == 302
+assert c.get('/participants').status_code == 200   # gate open after auth
+print('OK')
+"
 ```
 
-If all three pass locally, CI will almost certainly pass too.
+If those pass locally, CI will almost certainly pass too.
 
 ## If CI fails on a push
 
