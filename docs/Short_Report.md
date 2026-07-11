@@ -64,8 +64,10 @@ automated checks.
 
 ### User journeys
 
-- **Attendee:** Home → Register → submit → confirmation ref
-- **Organiser:** Home → Participants → click a row → Detail → Edit or Cancel
+- **Attendee:** Home -> Register -> submit -> sees their own confirmation ref
+  on the public detail page.
+- **Organiser:** Home -> `/login` (shared password) -> Participants ->
+  click a row -> Detail -> Edit or Cancel.
 
 ## 3. Main features
 
@@ -77,12 +79,13 @@ automated checks.
 | Registration form with server validation   | `GET/POST /register` in `routes.py` -> `templates/register.html` |
 | Participant list (auto-updating)           | `GET /participants` -> `templates/participants.html` |
 | Detail page per registration               | `GET /registration/<id>` -> `templates/detail.html` |
-| Edit registration                          | `GET/POST /registration/<id>/edit` -> `templates/edit.html` |
-| Cancel / restore registration (soft-delete)| `POST /registration/<id>/cancel` and `/restore` |
+| Edit registration                          | `GET/POST /registration/<id>/edit` -> `templates/edit.html` (organiser-only) |
+| Cancel / restore registration (soft-delete)| `POST /registration/<id>/cancel` and `/restore` (organiser-only) |
+| Organiser gate (shared password)           | `event_registration/auth.py` + `/login` route      |
 | Two related tables (`Event` < `Registration`) | `models.py`: `Event` + `Registration` with FK   |
 | Capacity + duplicate-email enforcement     | `register()` in `routes.py` (SQLAlchemy queries)    |
 | HTML / CSS styling                          | `templates/base.html` + `static/css/styles.css` |
-| JavaScript interaction (clipboard + char counter) | `static/js/app.js`                             |
+| JavaScript interaction (live char counter) | `static/js/app.js` (notes count-down, vanilla JS) |
 
 [TODO: 2–3 annotated screenshots of each major screen]
 
@@ -149,14 +152,18 @@ Current status as of submission: **all commits on `main` have a green tick**.
 
 These were run against `https://pydublin-workshop-registration.onrender.com`
 with `curl` after the deploy stabilised. They prove the production
-environment (gunicorn + Render free tier) actually serves each route:
+environment (gunicorn + Render free tier) actually serves each route,
+and that the organiser gate works on the public URL:
 
 | Method + Path                            | Expected                       | Actual            |
 |------------------------------------------|--------------------------------|-------------------|
-| `GET /`                                  | 200 + event title in HTML      | 200, 2453 B       |
-| `GET /register`                          | 200 + submit button present    | 200, 2647 B       |
+| `GET /`                                  | 200 + event title in HTML      | 200, ~2.5 KB      |
+| `GET /register`                          | 200 + submit button present    | 200, ~2.6 KB      |
 | `POST /register` (valid form data)      | 302 -> `/registration/<id>`    | 302 -> `/registration/3` |
-| `GET /participants` after the POST      | New registration appears in list | 1 match for the test email |
+| `GET /registration/<id>`                 | 200 - detail page is PUBLIC    | 200 (attendee's own confirmation) |
+| `GET /participants` (no login cookie)    | 302 -> `/login` (gate works)   | 302 to `/login`   |
+| `GET /participants` (after `/login`)     | 200 - organiser sees the list  | 200               |
+| `POST /login` with wrong password        | 200 (re-renders login form, no session set) | 200, no session |
 | `GET /registration/99999`               | 404 via custom error handler   | 404               |
 
 ### 6.3 Manual UI tests in the browser
@@ -173,9 +180,10 @@ live app):
 | 5 | List participants                                    | All active registrations shown desc by date| ✓    |
 | 6 | Edit a registration, save                            | Changes persist after refresh              | ✓    |
 | 7 | Cancel a registration                                | Status flips to Cancelled; seat frees up   | ✓    |
-| 8 | JS: click "Copy event ref"                           | Ref string on clipboard                    | ✓    |
-| 9 | JS: type in notes field                              | Char counter updates live                  | ✓    |
-| 10| Refresh Participants after cancelling                | Cancelled row hidden from default view     | ✓    |
+| 8 | JS: type in notes field                              | Char counter updates live + turns red >280 | ✓    |
+| 9 | Unauthenticated visit to `/participants`              | Redirects to `/login`                      | ✓    |
+| 10| Login with wrong password                            | Form re-renders, no session set            | ✓    |
+| 11| Refresh Participants after cancelling                | Cancelled row hidden from default view     | ✓    |
 
 [TODO: attach screenshots for the most important scenarios.]
 
@@ -183,9 +191,8 @@ live app):
 
 *~½ page*
 
-- **No authentication** — anyone with the URL can currently see the participant
-  list. Future: use Flask-Login for proper organiser accounts.
-- **Single event** — the demo seeds one Event row; multi-event would just need
+- **Single shared organiser password** - the gate is a single password shared among the four team members, not per-user accounts. A real production deploy would use Flask-Login with bcrypt-hashed accounts, plus stronger rate-limiting on `/login`.
+- **Single event** - the demo seeds one Event row; multi-event would just need
   a list-detail UI on top of the same schema.
 - **No payment** — `price` is informational; future: integrate Stripe via
   Flask routes and a hosted checkout.

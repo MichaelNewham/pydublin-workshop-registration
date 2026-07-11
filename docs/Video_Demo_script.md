@@ -49,40 +49,38 @@ git repo — Python Forms, YAML config, HTML/CSS theme.
 
 > Caption: "Server-side validation: no duplicates, no overbooking"
 
-## 2:45–4:00 — Organiser journey (presenter 3)
+## 2:45-4:00 - Organiser journey (presenter 3)
 
-**On-screen:** Home → Participants → click a row.
+**On-screen:** Home page, then `/login`.
 
 **Say + do:**
 
-7. Click **View participants** — show the list, the count, the repeating rows.
-8. Click one row — show the Detail page.
-9. Click **Edit** — change the company, **Save**.
-10. Back to Detail — click **Cancel registration**. Confirm. Show the status
+7. Point out that **View participants is NOT in the public nav** - a deliberate design decision (the organiser screens are gated). Visit `/login`.
+8. Enter the shared organiser password, sign in. Show the nav bar now shows **Participants** + **Sign out**.
+9. Click **Participants** - show the list, the count, the repeating rows.
+10. Click one row - show the Detail page.
+11. Click **Edit** - change the company, **Save**.
+12. Back to Detail - click **Cancel registration**. Confirm. Show the status
     flips to Cancelled and a Restore button appears.
 
-> Caption: "Soft-delete preserves the audit trail"
+> Caption: "Organiser gate (shared password) + soft-delete audit trail"
 
-## 4:00–4:45 — JS clipboard + responsive design (presenter 3)
+### 4:00-4:45 - JS char counter + responsive design (presenter 3)
 
-**On-screen:** Home page on a narrow browser window.
+**On-screen:** Register page (`/register`) on a narrow browser window.
 
 **Say + do:**
 
-11. Click **Copy event ref to clipboard** — paste into a text editor to prove it.
-12. Resize the window narrow — show the header reflows (CSS media query).
+13. Open `/register` and start typing a long note into the notes box - point at the live counter ticking down, then turning red past 280 chars.
+14. Resize the window narrow - show the header reflows (CSS media query).
 
-> Captions: "JS interaction #2: clipboard" / "Basic responsive CSS"
+> Captions: "JavaScript interaction: live character counter" / "Basic responsive CSS"
 
-## 4:45–5:30 — Under the hood (presenter 4)
+## 4:45-5:30 - Under the hood (presenter 4)
 
 **On-screen:** VS Code / GitHub showing the repo.
 
-**Say:** Here's the file layout. [`event_registration/anvil.yaml`] declares the
-database — two tables, one Related, with a liveObject link. This is where the
-required JS interaction is wired in too. All the business logic — capacity
-checks, duplicate-email checks, cancel/restore — lives in
-[`server_code/ServerModule1.py`].
+**Say:** Here's the file layout. [`event_registration/models.py`] declares the data layer - two tables (`Event` + `Registration`) with a foreign-key relationship. [`routes.py`] wires every URL route; the organiser-only ones are protected by the `@login_required` decorator in [`auth.py`]. All the business logic - capacity checks, duplicate-email checks, cancel/restore - lives in `routes.py`. The JavaScript interaction is in [`static/js/app.js`] - a live character counter, pure vanilla JS, no libraries.
 
 ## 5:30–6:30 — Who did what (all four, one line each)
 

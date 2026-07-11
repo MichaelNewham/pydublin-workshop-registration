@@ -17,7 +17,12 @@
     <nav class="site-nav">
       <a href="{{ url_for('routes.home') }}">Event</a>
       <a href="{{ url_for('routes.register') }}">Register</a>
-      <a href="{{ url_for('routes.participants') }}">Participants</a>
+      {% if is_organiser %}
+        <a href="{{ url_for('routes.participants') }}">Participants</a>
+        <form method="POST" action="{{ url_for('routes.logout') }}" style="display:inline">
+          <button type="submit" class="btn-link">Sign out</button>
+        </form>
+      {% endif %}
     </nav>
   </header>
 
@@ -43,7 +48,7 @@
     </p>
   </footer>
 
-  {# -- the mandatory JavaScript interaction (clipboard + char counter) -- #}
+  {# -- the mandatory JavaScript interaction (live character counter) -- #}
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% block extra_js %}{% endblock %}
 </body>

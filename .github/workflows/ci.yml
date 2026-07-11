@@ -38,19 +38,49 @@ jobs:
         env:
           SECRET_KEY: ci-test-secret
           FLASK_DEBUG: '1'
+          # Use a known test-only password for the gate so the smoke test
+          # can authenticate. The default ('pydublin-2026') would also work.
+          ORGANISER_PASSWORD: ci-test-pw
         run: |
           python - <<'PY'
           from event_registration import create_app
           app = create_app()
           client = app.test_client()
-          # Home route must return 200
-          r = client.get('/')
-          assert r.status_code == 200, f"home returned {r.status_code}"
-          # Registration GET must return 200
-          r = client.get('/register')
-          assert r.status_code == 200, f"register GET returned {r.status_code}"
-          # Participants list must return 200
+
+          # --- Public routes must return 200 ---
+          r = client.get('/');          assert r.status_code == 200, f"home returned {r.status_code}"
+          r = client.get('/register');  assert r.status_code == 200, f"register GET returned {r.status_code}"
+          r = client.get('/login');     assert r.status_code == 200, f"login GET returned {r.status_code}"
+
+          # --- Organiser gate: unauthenticated /participants must redirect to /login ---
           r = client.get('/participants')
-          assert r.status_code == 200, f"participants returned {r.status_code}"
-          print("All smoke tests passed.")
+          assert r.status_code == 302, f"participants (unauth) should be 302, got {r.status_code}"
+          assert '/login' in r.headers.get('Location', ''), f"expected redirect to /login, got {r.headers.get('Location')}"
+
+          # --- Register a row so /participants has content after auth ---
+          r = client.post('/register', data={
+              'name': 'CI Test', 'email': 'ci@example.com',
+              'phone': '', 'company': '', 'notes': '',
+          }, follow_redirects=False)
+          assert r.status_code == 302, f"POST /register should be 302, got {r.status_code}"
+
+          # --- Wrong password is rejected (form re-renders, no session cookie set) ---
+          r = client.post('/login', data={'password': 'wrong-pw'})
+          assert r.status_code == 200, f"wrong-pw POST should re-render login (200), got {r.status_code}"
+          r = client.get('/participants')
+          assert r.status_code == 302, f"after wrong-pw /participants should still redirect, got {r.status_code}"
+
+          # --- Correct password unlocks the gate ---
+          r = client.post('/login', data={'password': 'ci-test-pw'}, follow_redirects=False)
+          assert r.status_code == 302, f"correct-pw POST should redirect (302), got {r.status_code}"
+          r = client.get('/participants')
+          assert r.status_code == 200, f"after login /participants should be 200, got {r.status_code}"
+
+          # --- Logout re-locks the gate ---
+          r = client.post('/logout', follow_redirects=False)
+          assert r.status_code == 302, f"logout should redirect (302), got {r.status_code}"
+          r = client.get('/participants')
+          assert r.status_code == 302, f"after logout /participants should redirect again, got {r.status_code}"
+
+          print("All smoke tests passed (public + gate + auth + logout).")
           PY
