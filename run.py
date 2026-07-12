@@ -3,7 +3,8 @@ run.py - entry point for development.
 
     python run.py
 
-This is also what Render calls (`gunicorn` wraps `app:create_app()`).
+Production: Render runs `gunicorn run:app` (the module-level `app`
+instance defined below). See render.yaml + Procfile.
 """
 
 import os

@@ -1,8 +1,3 @@
-# --- Anvil standalone app-server artefacts ---
-.anvil-data/
-.anvil-editor/
-.anvil-secrets/
-
 # --- Python ---
 __pycache__/
 *.py[cod]
@@ -25,3 +20,10 @@ Thumbs.db
 *.log
 *.tmp
 .firecrawl/
+
+# --- Local app database (created by seed.py on first boot) ---
+event_registration/*.db
+event_registration/app.db
+
+# --- Local env ---
+.env
