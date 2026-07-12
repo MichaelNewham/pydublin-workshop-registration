@@ -23,7 +23,7 @@ which checks a shared-password session flag (see auth.py). This keeps
 attendee contact details off the public internet while staying inside
 the brief's scope (no per-user accounts).
 
-Business rules carried over verbatim from the Anvil version:
+Business rules in this module:
   -> capacity check (cannot overbook)
   -> duplicate email check (one registration per email per event)
   -> soft-delete for cancellation (preserves audit trail)

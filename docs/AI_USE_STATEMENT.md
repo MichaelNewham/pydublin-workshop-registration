@@ -6,28 +6,31 @@ it must be explained." This statement is also mirrored in the final report's
 
 ## Tools used
 
-- **GitHub Copilot (Chat mode)** — scaffolding, code generation, documenting
-- **Anvil AI assistant** (in the Anvil cloud IDE) — component suggestions
-- **ChatGPT / Claude** (optional, as the group prefers) — proofreading, email drafts
+- **GitHub Copilot (Chat mode)** - scaffolding, code generation, documenting
+- **ChatGPT / Claude** (optional, as the group prefers) - proofreading, email drafts
 
 ## Tasks AI assisted with
 
-1. **Initial project scaffold** — directory layout, `anvil.yaml` config,
-   `db_schema` for the `Event` and `Registration` tables.
-2. **Server-side CRUD functions** — drafts of `create_registration`,
-   `update_registration`, `cancel_registration` in `ServerModule1.py`.
-3. **Form Python** — wire-up of button handlers and navigation between Forms.
-4. **CSS theme** — first draft of `theme.css` and `standard-page.html` shell.
-5. **Documentation** — README, this AI-use statement, and the short report
+1. **Initial project scaffold** - directory layout, Python package
+   structure, and the SQLAlchemy `Event` + `Registration` models (an
+   earlier draft of the project used a low-code platform; the team
+   pivoted to Flask early and the AI re-scaffolded around the new stack).
+2. **Server-side CRUD functions** - first drafts of `create_registration`,
+   `update_registration`, `cancel_registration`. Now live as Flask routes
+   in `routes.py`.
+3. **Template logic** - wire-up of form handlers and navigation between
+   pages. Now Jinja2 templates in `event_registration/templates/`.
+4. **CSS theme** - first draft of `static/css/styles.css`.
+5. **Documentation** - README, this AI-use statement, and the short report
    outline.
 
 ## What the group accepted
 
-- The overall folder structure (`client_code` / `server_code` / `theme`) —
-  matches the official Anvil Python Directory Structure doc.
-- The YAML layout for `anvil.yaml` (services, `db_schema`, `native_deps`).
-- The soft-delete pattern for cancellation (status = `'cancelled'` instead of
-  a hard delete, preserving the audit trail).
+- The overall folder structure (`event_registration/` package split into
+  `models.py` + `routes.py` + `templates/` + `static/`).
+- The soft-delete pattern for cancellation (status = `'cancelled'` instead
+  of a hard delete, preserving the audit trail).
+- The capacity + duplicate-email validation rules.
 
 ## What the group corrected or rejected
 
@@ -37,27 +40,25 @@ it must be explained." This statement is also mirrored in the final report's
   identified this as a data-protection issue (attendee names, emails,
   phone numbers, and accessibility notes would be publicly scrapable)
   and corrected it by adding a shared-password gate (`event_registration/auth.py`
-  + `/login` route) and removing the public links.
+  + `/login` route) and removing the public links. (Landed in PR #1.)
 - **Removal of the redundant clipboard button** - the AI scaffold added
   a "Copy event ref to clipboard" button on the home page. The team
   reviewed the brief, saw that only one JavaScript interaction is
   required and that the live character counter already satisfies it,
   and removed the clipboard button as over-extrapolation beyond scope.
-- **Validation rules** - the AI's first draft of `create_registration` did not
+  (Landed in PR #1.)
+- **Validation rules** - the AI's first draft of `register()` did not
   catch duplicate emails or sold-out events; the team added those checks
   explicitly after writing test cases.
-- **JS interaction** — the AI initially proposed a jQuery clipboard library;
-  we replaced it with the modern `navigator.clipboard` API (no extra dep).
-- **Login** — the AI suggested per-user accounts; we deferred that to
-  "future improvements" to keep scope realistic for the deadline.
 
 ## What the group learned
 
 - AI accelerates boilerplate (config files, CRUD fns, CSS) significantly.
-- It does **not** replace domain-specific validation — those came from us
+- It does **not** replace domain-specific validation - those came from us
   knowing the business rules (capacity, no duplicate emails).
-- An Anvil project is just Python + YAML + HTML/CSS, so AI code edit
-  suggestions and human review land cleanly in git diffs.
+- It needs to be checked against the brief: the AI scaffold went beyond
+  what was asked in two places (public participants list, redundant
+  clipboard button), both of which were caught and corrected in code review.
 
 ## Responsibility
 

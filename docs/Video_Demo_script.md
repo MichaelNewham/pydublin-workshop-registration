@@ -5,33 +5,36 @@
 
 ## 0:00-0:30 - The problem (one presenter)
 
-**On-screen:** Title card "PyDublin Workshop 2026 - Event Registration System,
+**On-screen:** Title card "PyCon Ireland 2026 - Event Registration System,
 Option A." Then cut to the live home page:
 https://pydublin-workshop-registration.onrender.com
 
-**Say:** A 40-seat Python workshop in Dublin needs a registration tool. Today
-it's run on a spreadsheet sent by email — which causes overbooking, duplicate
-sign-ups, and lost edits. We built a small low-code app with **Anvil** that
-solves all three.
+**Say:** A 40-seat Python conference in Dublin needs a registration tool.
+Today it's run on a spreadsheet sent by email - which causes overbooking,
+duplicate sign-ups, and lost edits. We built a small web app with Python
++ Flask that solves all three.
 
-## 0:30–1:00 — The stack (same presenter)
+## 0:30-1:00 - The stack (same presenter)
 
-**On-screen:** Slides: Anvil logo, "Pure Python FE + BE", "SQLite via Data
-Tables", "Open-source standalone server".
+**On-screen:** Slides: "Python + Flask", "SQLAlchemy + SQLite",
+"Jinja2 templates", "Auto-deployed to Render via git push".
 
-**Say:** The brief asked for a low-code app from Week 10. We picked **Anvil**
-because it's the only platform that uses Python on both front-end and back-end,
-which fits what we've been learning all semester. The whole project is a
-git repo — Python Forms, YAML config, HTML/CSS theme.
+**Say:** The brief asks for a small web app in Python, Flask, SQLite, HTML,
+CSS, and JavaScript - exactly what we've been learning this semester.
+We picked Flask + SQLAlchemy + Jinja2 because they cover all six required
+techs in one stack. The whole project is a git repo - every commit
+triggers CI on GitHub Actions, and every merge auto-deploys to a public
+URL on Render.
 
-## 1:00–2:00 — Walkthrough: attendee journey (presenter 2)
+## 1:00-2:00 - Walkthrough: attendee journey (presenter 2)
 
-**On-screen:** Browser at http://localhost:3030 — Home page.
+**On-screen:** Browser at https://pydublin-workshop-registration.onrender.com
+- Home page.
 
 **Say + do:**
 
-1. Point at the event info — date, location, price, seats remaining.
-2. Click **Register now** — show the form.
+1. Point at the event info - date, location, price, seats remaining.
+2. Click **Register now** - show the form.
 3. Fill name, email, phone, company. (Do **not** submit yet.)
 4. Type in the notes box — point at the live character counter.
 
@@ -106,6 +109,8 @@ for watching.
 - [ ] Increase browser zoom to ~110% so text is readable.
 - [ ] Use the **Chrome Anvil IDE** for any live editing shots - looks better
       than the local Docker view.
+      (Edit after the pivot: shoot the live Render URL instead, in a normal
+      browser tab - https://pydublin-workshop-registration.onrender.com)
 - [ ] Speakers: **Michael Newham (261012020), Sergiu D (261024894), Paul Sealy (261018041), Alessandro Genco (262016773)**
       (watermark each shot with the speaker's name).
 - [ ] Export at 1080p, MP4, H.264.

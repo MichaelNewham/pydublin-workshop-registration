@@ -3,9 +3,10 @@ event_registration.seed
 ======================
 
 On first boot the DB is empty. This module seeds a demo Event so the app
-has something to show on the homepage immediately. Idempotent.
-
-Replaces the old Anvil `get_or_create_demo_event()` server function.
+has something to show on the homepage immediately. Idempotent: first boot
+creates everything; subsequent boots UPDATE the Event row to match this
+function so rebrands propagate without manual DB cleanup (Registrations
+are left untouched).
 """
 
 from datetime import datetime

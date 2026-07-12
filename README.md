@@ -1,4 +1,4 @@
-# PyDublin Workshop 2026 - Event Registration System
+# PyCon Ireland 2026 - Event Registration System
 
 A small web application for event registration, built with **Python + Flask
 + SQLAlchemy + SQLite**, plus Jinja2 templates, plain CSS, and vanilla JS.
@@ -9,10 +9,9 @@ Event Registration Web App).
 > **Live app:** https://pydublin-workshop-registration.onrender.com
 > (Render free tier - first hit may take up to 50 s to cold-start, then fast.)
 
-> Read [`Project_Overview.md`](Project_Overview.md) and
-> `Project - Business Programming May 2026 - Guidelines.pdf` for the official
-> brief. This README explains how to **run locally**, how to **deploy**, and
-> how the project is organised.
+> See `Project - Business Programming May 2026 - Guidelines.pdf` for the
+> official brief. This README explains how to **run locally**, how to
+> **deploy**, and how the project is organised.
 
 ---
 
@@ -146,7 +145,7 @@ production build, swap `DATABASE_URL` to a Render Postgres instance.
 | Option             | A - Event Registration Web App                       |
 | Stack              | Flask + SQLAlchemy + SQLite + Jinja2 + plain CSS/JS  |
 | Event type         | Workshop                                             |
-| Event name         | PyDublin Workshop 2026 - Python for Business         |
+| Event name         | PyCon Ireland 2026 - Python for Business         |
 | Registration fields| name, email, phone, company, notes                   |
 | Organiser gate      | Shared password at `/login` (env: `ORGANISER_PASSWORD`)   |
 | Git remote         | `MichaelNewham/pydublin-workshop-registration` (private; invite-only for collaborators) |

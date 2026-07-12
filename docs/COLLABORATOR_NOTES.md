@@ -1,6 +1,6 @@
 # Collaborator notes
 
-> Hello team. This is your one-page guide to working on the PyDublin Workshop
+> Hello team. This is your one-page guide to working on the PyCon Ireland
 > 2026 Event Registration System. Each of you has a specific **block** of
 > files to own; this doc tells you exactly what to touch and how to push
 > changes safely. Read the **Common setup** section once, then jump to
