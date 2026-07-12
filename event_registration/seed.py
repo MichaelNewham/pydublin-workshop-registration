@@ -20,16 +20,17 @@ def seed_demo_data(app):
             return  # already seeded
 
         event = Event(
-            title="PyDublin Workshop 2026 - Python for Business",
-            date=datetime(2026, 9, 15, 9, 30),
-            location="Dublin Digital Hub, 10-12 Thomas St, Dublin 8",
+            title="PyCon Ireland 2026 - Python for Business",
+            date=datetime(2026, 10, 17, 9, 30),
+            location="Trinity College Dublin, College Green, Dublin 2",
             capacity=40,
             price=25.00,
             description=(
-                "A one-day, hands-on workshop introducing Python for "
-                "business automation: data cleaning with pandas, building "
+                "A one-day, single-track conference day introducing Python "
+                "for business automation: data cleaning with pandas, building "
                 "Flask web apps, and web scraping with BeautifulSoup. "
-                "Laptops required. Coffee & lunch provided."
+                "Anchored to the real PyCon Ireland 2026 announcement "
+                "(python.ie). Laptops required. Coffee & lunch provided."
             ),
         )
         db.session.add(event)
