@@ -213,11 +213,10 @@ https://github.com/MichaelNewham/pydublin-workshop-registration/pull/1
 
 ### 🟦 Sergiu D - Block B: Templates (25%)
 
-You own every HTML page.
+You own every HTML page. Your first PR has been pre-scoped - see below.
 
-**Your files (all under `event_registration/templates/`):**
-- `base.html` - the shared shell (header / footer / CSS / JS includes). Edit
-  this to change the brand mark or global nav.
+**Files you own (all under `event_registration/templates/`):**
+- `base.html` - the shared shell (header / footer / CSS / JS includes).
 - `home.html` - the event information page (the first thing visitors see).
 - `register.html` - the registration form.
 - `participants.html` - the organiser's list.
@@ -225,81 +224,222 @@ You own every HTML page.
 - `edit.html` - the edit form.
 - `error.html` - 404 / 500 fallback.
 
-**Typical tasks:**
-- Add an empty-state illustration to `participants.html` (when nobody has
-  registered yet).
-- Add a "registered at" timestamp column to the participants table.
-- Tighten the layout of `register.html`.
+### Suggested first PR: "Add a day-of schedule section to the home page"
 
-**Workflow tips:**
-- Jinja2 syntax: `{% if condition %}`, `{% for x in items %}`,
-  `{{ variable }}`. Ask Michael if you need a new variable passed in from
+The current home page shows event title + date + price + a Register button.
+The brief doesn't ask for a schedule, but adding a simple **itinerary**
+makes the app feel like a real conference site and is a natural extension
+of "event information page". Anchor it to a real event so the content
+isn't invented:
+
+**Source:** Python Ireland hosts an actual **PyCon Ireland 2026** on
+**Saturday 17 October at Trinity College Dublin** (see https://python.ie/
+for the public announcement). Use that as the model: a workshop / single-
+track day with ~5 sessions and breaks.
+
+**What to build**
+- A new section in `home.html` (below the existing `.event-card`) called
+  something like `.schedule-section` with a `<table>` of times + sessions,
+  plus a short intro line. Suggested rows:
+  ```
+  09:00  Registration + coffee
+  09:30  Keynote: Python in Irish business (TBC)
+  10:30  Talk: pandas for business reporting
+  11:15  Coffee break
+  11:30  Workshop: building a Flask web app (hands-on)
+  13:00  Lunch (provided)
+  14:00  Talk: scraping competitor prices ethically
+  15:00  Lightning talks
+  16:00  Wrap-up + networking
+  ```
+- All content lives entirely in `home.html` as static prose - you don't
+  need a new model or route for v1. (If you want database-backed sessions
+  later, ask Michael via a Block A coordination PR.)
+- Give the section a heading + an intro line like:
+  > "Provisional schedule for PyCon Ireland 2026 - subject to change."
+  This is honest and protects you if python.ie shifts the agenda later.
+
+**Branch and PR name**
+- Branch: `sergiu/home-schedule-section`
+- Commit message: `ui(home): add day-of schedule section (PyCon IE 2026 model)`
+- PR title: `Add day-of schedule to home page`
+
+**Coordinate with**
+- **Paul (C)** will restyle your `<table>` via `styles.css`; just use
+  sensible semantic classes (e.g. `.schedule-table` with `<th>` for
+  "Time" / "Session"). Paul will theme it.
+- **Michael (A)** if you also need the event *title + date* to say
+  "PyCon Ireland 2026, 17 October, Trinity College Dublin" - those
+  values live in `seed.py` (Block A). Open a small cross-block PR or
+  ask Michael to update them in his next commit.
+
+**Don't break**
+- The `<textarea>` in `register.html` and `edit.html` has the JS character
+  counter wired to its sibling `.js-notes-counter`. If you move one, keep
+  them adjacent. (The JS lives in Paul's block.)
+- The `{% extends "base.html" %}` pattern stays - keep your new section
+  inside `{% block content %}` of `home.html`.
+
+**Workflow tips**
+- Jinja2 cheatsheet: `{% if cond %}`, `{% for x in items %}`,
+  `{{ variable }}`. Ask Michael if you need a new variable passed from
   the route.
 - Don't repeat the header / footer in each page - they live in `base.html`.
-  Each child page starts with `{% extends "base.html" %}`.
-- Watch out: the `<textarea>` in `register.html` and `edit.html` has the
-  JS character counter wired to its sibling `.js-notes-counter`. If you
-  move one, keep them adjacent.
+
+After this PR lands, your section here gets rewritten (same as Michael's)
+into a worked example for the next person to learn from.
 
 ---
 
 ### 🟪 Paul Sealy - Block C: CSS & JavaScript (25%)
 
-You own the look and the one required JS interaction.
+You own the look-and-feel and the (one) required JavaScript interaction.
 
-**Your files:**
+**Files you own:**
 - `event_registration/static/css/styles.css` (~260 lines, single source of truth for styling)
-- `event_registration/static/js/app.js` (the clipboard copy + the character counter)
+- `event_registration/static/js/app.js` (~40 lines, just a live character counter after PR #1)
 
-**Typical tasks:**
-- Re-theme the palette (change the CSS custom properties at the top: `--brand`,
-  `--accent`, etc.) - one-place colours everything.
-- Improve the responsive breakpoint (currently kicks in at 640px).
-- Add a subtle hover animation to the table rows in `participants.html`.
-- Polish the JS feedback (e.g. the "Copied: XXX" tooltip duration).
+### Suggested first PR: "Rebrand to PyCon Ireland colours + logo"
 
-**Workflow tips:**
-- I've used CSS custom properties (`:root { --brand: #1a7a3a; }`) - change
-  them and the whole app re-themes. Avoid hardcoding colours further down.
-- `app.js` is a single IIFE - it binds to anything with class `.js-copy-ref`
-  and any `.js-notes-counter` sibling of a `<textarea>`. If Sergiu renames
-  those classes, the JS breaks; coordinate with him.
-- You can edit the CSS freely without coordinating - it's a single file.
+The current palette is generic green (`--brand: #1a7a3a`). For a
+realistic PyCon Ireland demo, re-theme around Python's actual brand:
+the language's classic **blue (#306998) + yellow (#FFD43B)** of the
+Python logo (which Python Ireland also uses). With attribution, of
+course.
+
+**What to build**
+- Update the CSS custom properties at the top of `styles.css`:
+  ```css
+  :root {
+    --brand: #306998;       /* Python blue */
+    --brand-dark: #1f4d75;
+    --accent: #FFD43B;      /* Python yellow */
+    /* keep --bg, --surface, --text as-is */
+  }
+  ```
+  This one change re-themes the header mark, primary buttons, focus rings,
+  and the price colour across the whole app.
+- Save the Python Ireland logo to `static/img/python-ireland-logo.png`
+  (create the `static/img/` folder). Right-click the logo at
+  https://python.ie/ - save PNG. Roughly 80x80 px is fine.
+- Edit `templates/base.html` to display the logo in the header (next to
+  the brand mark) using:
+  ```html
+  <img src="{{ url_for('static', filename='img/python-ireland-logo.png') }}"
+       alt="Python Ireland" class="brand-logo" />
+  ```
+  Plus a CSS rule for `.brand-logo` (something like `height: 32px;
+  vertical-align: middle; margin-right: 8px;`).
+- Edit `templates/base.html` footer to add the attribution line:
+  > `Logo \u00a9 Python Ireland, used here for an academic project demo.`
+
+**Branch and PR name**
+- Branch: `paul/rebrand-pycon-ireland`
+- Commit message: `style: rebrand to PyCon Ireland palette + logo (with attribution)`
+- PR title: `Rebrand to PyCon Ireland colours and add logo`
+
+**Coordinate with**
+- **Sergiu (B)** - if he lands his schedule-section first, theme his
+  `.schedule-table` so it matches (borders, hover, etc.). If you land
+  first, your `--brand` change will already recolour his table headers.
+- **Alessandro (D)** - tell him so he can update the report + screenshots
+  to show the PyCon rebrand.
+
+**Polish ideas (optional, after the rebrand lands)**
+- Improve the responsive breakpoint (currently 640px, may need widening
+  for the new schedule table).
+- Add a subtle `-webkit-transition` on `.participants-table tbody tr:hover`.
+- Tighten the `.field-hint` colour to use `--text-muted` consistently.
+
+**Don't break**
+- `static/js/app.js` is a single IIFE that binds to every
+  `.js-notes-counter` (the live character counter - this is the **one
+  JavaScript interaction** the brief requires; it's already done and
+  covered by CI). Don't touch the file unless you have a specific bug to
+  fix.
+- If Sergiu renames the `.js-notes-counter` class, the JS breaks - he's
+  been warned; flag it on his PR if you spot it.
+
+**Workflow tips**
+- Change the CSS variables once at the `:root` and the whole site
+  re-themes - avoid hardcoding Python blue anywhere else.
+- Logo attribution in the footer is non-negotiable for an academic
+  project using a real organisation's branding.
 
 ---
 
 ### 🟧 Alessandro Genco - Block D: Docs, Testing & PM (20%)
 
-You own everything that isn't running code. This is the deployment + the
+You own everything that isn't running code. This is the deployment +
 deliverables the tutor will grade directly.
 
-**Your files:**
+**Files you own:**
 - `README.md` - the repo's front door.
-- `docs/Short_Report.md` - the <=8-page report (still has `[TODO]` slots for
+- `docs/Short_Report.md` - the <=8-page report (has `[TODO]` slots for
   screenshots + final date).
 - `docs/Video_Demo_script.md` - the shot list for the 7-minute demo.
 - `docs/Individual_Contribution.csv` - the grade-weighting sheet.
-- `docs/AI_USE_STATEMENT.md` - the transparency statement (already written).
-- `docs/CI_SETUP.md`, `docs/COLLABORATOR_NOTES.md` (this file).
+- `docs/AI_USE_STATEMENT.md` - the transparency statement.
+- `docs/CI_SETUP.md`, `docs/COLLABORATOR_NOTES.md` (this file),
+  `docs/SUBMISSION_CHECKLIST.md`.
 - `render.yaml` (the Render deploy config - already working, only touch if
   the deploy needs to change).
 
-**Typical tasks:**
-- **Screenshots**: visit the live app, screenshot Home / Register / List /
-  Detail / Edit, drop them into `docs/screenshots/`, embed in `Short_Report.md`.
-- **Report PDF**: when the markdown is final, `pandoc docs/Short_Report.md
-  -o docs/Short_Report.pdf` or just print to PDF from VS Code.
-- **Demo video**: follow `docs/Video_Demo_script.md`. Loom / OBS / QuickTime
-  all work. Keep under 7 minutes.
-- **Final QA pass**: walk the live URL through every scenario in
-  `Short_Report.md` section 6 + tick each box.
+### Suggested first PR: "Refresh report + README to match PyCon rebrand"
 
-**Workflow tips:**
-- You're also the **release manager**. Before the submission, run a last
-  pass: confirm CI is green, the live URL works from a private tab, the
-  README's live URL matches, no `[TODO]` is left in the report.
-- Build the **Moodle submission ZIP** last: `zip -r submission.zip . -x
-  '.git/*' '.venv/*' '__pycache__/*'` from inside the project folder.
+Once Sergiu (B) and Paul (C) land their PyCon Ireland rebrand PRs, the
+report and README will be out of date. Your PR catches them up:
+
+**What to do**
+- Update `README.md`'s top description + decisions table:
+  - "PyDublin Workshop 2026" -> "PyCon Ireland 2026 (academic demo)"
+  - Add a row noting the Python Ireland logo attribution.
+- Update `docs/Short_Report.md`:
+  - Cover page title + business problem section (align with the
+    "registration system for PyCon Ireland 2026" framing).
+  - Section 3 "Main features": add a row for the day-of schedule
+    section Sergiu built.
+  - Section 4 "Technologies": add `static/img/python-ireland-logo.png`
+    as a static asset.
+- Add a new subsection to `docs/AI_USE_STATEMENT.md` if Paul's rebrand
+  used AI to pick colours or write CSS - he should send you a 1-line
+  summary of what AI helped with.
+
+**Branch and PR name**
+- Branch: `alessandro/report-pycon-rebrand-refresh`
+- Commit message: `docs: align README + report with PyCon Ireland rebrand`
+- PR title: `Refresh docs to reflect PyCon Ireland rebrand`
+
+**Open-ended tasks (no PR needed, just do them)**
+- **Screenshots**: visit the live app after the rebrand + schedule
+  section are merged. Screenshot Home (with the new schedule + logo),
+  Register, Login, Participants, Detail, Edit. Drop into
+  `docs/screenshots/`, embed in `Short_Report.md` section 6.
+- **Report PDF**: when markdown is final, `pandoc docs/Short_Report.md
+  -o docs/Short_Report.pdf` or browser-print to PDF.
+- **Demo video**: follow `docs/Video_Demo_script.md`. Loom / OBS /
+  QuickTime all work. **Keep under 7 minutes.**
+
+**Release manager duties (final QA before Moodle submission)**
+- Confirm CI is green on the latest `main` commit.
+- Live URL works in a private browser tab:
+  https://pydublin-workshop-registration.onrender.com
+- README's live URL matches the actual deployment.
+- No `[TODO]` is left in the report.
+- Individual contributions CSV sums to 100%.
+- Build the **Moodle submission ZIP** per
+  `docs/SUBMISSION_CHECKLIST.md` (not the rough command below; that's
+  the canonical one).
+- Verify the ZIP opens cleanly on a fresh machine.
+
+**Workflow tips**
+- You're the **release manager**. Block submission if anything in the
+  SUBMISSION_CHECKLIST fails.
+- Schedule your work to land **after** Sergiu + Paul + Michael have
+  merged their block work but **before** the submission deadline.
+- Your first PR (the docs-refresh) is real software-engineering work,
+  not just typing - it's coordinating the team's content after a
+  cross-block rebrand.
 
 ---
 
