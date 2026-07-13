@@ -178,7 +178,7 @@ real attendee signups are never overwritten by redeploys.
 | Event name         | PyCon Ireland 2026 - Python for Business         |
 | Registration fields| name, email, phone, company, notes                   |
 | Organiser gate      | Shared password at `/login` (env: `ORGANISER_PASSWORD`)   |
-| Git remote         | `MichaelNewham/pydublin-workshop-registration` (private; invite-only for collaborators) |
+| Git remote         | `MichaelNewham/pydublin-workshop-registration` (public) |
 
 ---
 

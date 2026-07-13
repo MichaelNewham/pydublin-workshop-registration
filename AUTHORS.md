@@ -21,5 +21,5 @@ If you only look at one file, look at this one for *who is in the team* and
 ## Repo ownership
 
 The repo lives at
-https://github.com/MichaelNewham/pydublin-workshop-registration (private).
+https://github.com/MichaelNewham/pydublin-workshop-registration (public).
 Michael Newham is the repo owner; all four students are collaborators.
