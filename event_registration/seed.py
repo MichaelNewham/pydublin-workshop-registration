@@ -64,6 +64,14 @@ def seed_demo_data(app):
                     notes="",
                     event_id=event.id,
                 ),
+                Registration(
+                    name="Minnie Mouse",
+                    email="minnie@example.com",
+                    phone="+353 86 555 1234",
+                    company="Disney Corp.",
+                    notes="Wheelchair access please.",
+                    event_id=event.id,
+                ),
             ]
             db.session.add_all(sample)
             db.session.commit()

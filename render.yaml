@@ -23,3 +23,16 @@ services:
         value: "0"
       - key: PYTHON_VERSION
         value: "3.11.9"
+      # Required to make registrations persist across redeploys. Render's free
+      # web tier has an EPHEMERAL filesystem - the local app.db file is wiped
+      # on every deploy / rebuild / cold start, so real registration data is
+      # lost unless the DB lives outside the container.
+      #
+      # Set this to a managed Postgres connection string, e.g. from Neon:
+      #   postgresql://USER:PASSWORD@ep-xxxx.region.aws.neon.tech/dbname?sslmode=require
+      #
+      # The app auto-rewrites `postgres://` -> `postgresql://` (SQLAlchemy 2.x
+      # rejects the short form) and uses pool_pre_ping so Neon's idle-suspend
+      # doesn't break long-lived gunicorn workers.
+      - key: DATABASE_URL
+        sync: false   # value is set manually in the Render dashboard

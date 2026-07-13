@@ -42,7 +42,7 @@ A simple but complete event-registration tool for a small workshop:
 | Language   | Python 3.11                                             |
 | Framework  | Flask 3 (`flask`)                                       |
 | ORM        | SQLAlchemy (`flask_sqlalchemy`)                         |
-| Database   | SQLite (file-based; ephemeral on Render, by design)     |
+| Database   | Postgres on Render (managed). SQLite locally (`instance/app.db`). Registrations PERSIST across redeploys via `DATABASE_URL` env var. See [Making registrations persist](#making-registrations-persist) below. |
 | Templates  | Jinja2 (ships with Flask)                               |
 | Styling    | Plain CSS in `static/css/styles.css`                    |
 | JS         | Vanilla JS in `static/js/app.js` (no libraries)         |
@@ -135,6 +135,36 @@ This repo has a `render.yaml`, so deployment is push-to-deploy:
 SQLite on Render is ephemeral - the DB resets on each deploy. That's
 intentional for a marking demo (the seed runs fresh each time). For a
 production build, swap `DATABASE_URL` to a Render Postgres instance.
+
+### Making registrations persist
+
+Render's free web tier has an **ephemeral filesystem** - any file written
+at runtime (including `app.db`) is wiped on every deploy, rebuild, and
+idle cold start. That means registration data does not survive a redeploy
+unless the database lives **outside the container**.
+
+To make registrations persist (the current production setup):
+
+1. Create a free Postgres instance at
+   [neon.tech](https://neon.tech) (sign in with GitHub).
+2. Copy its connection string (looks like
+   `postgresql://user:password@ep-xxxx.region.aws.neon.tech/dbname?sslmode=require`).
+3. In the Render dashboard: **pydublin-workshop-registration -> Environment
+   -> Add Environment Variable -> `DATABASE_URL`** -> paste the string.
+4. Trigger a redeploy (any `git push` to `main` works, or click
+   **Manual Deploy** on Render).
+
+The app:
+- auto-rewrites the legacy `postgres://` scheme to `postgresql://`
+  (SQLAlchemy 2.x rejects the short form),
+- enables `pool_pre_ping` + a sub-5-minute `pool_recycle` so Neon's
+  idle-suspend doesn't break long-lived gunicorn workers,
+- falls back to local SQLite if `DATABASE_URL` is unset (so local dev and
+  CI keep working with no extra setup).
+
+Seed behaviour: `seed.py` only seeds Alice Example, Bob Demo **and Minnie
+Mouse** on an empty database. Once seeded, registrations persist forever -
+real attendee signups are never overwritten by redeploys.
 
 ---
 

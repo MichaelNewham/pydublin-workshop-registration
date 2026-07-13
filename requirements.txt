@@ -6,5 +6,6 @@ SQLAlchemy==2.0.30
 # Production WSGI server (used by Render)
 gunicorn==22.0.0
 
-# Optional - for the future Postgres backend
-# psycopg2-binary==2.9.9
+# PostgreSQL driver - required when DATABASE_URL points at Postgres
+# (Neon / Supabase / Render Postgres). Safe to leave installed for SQLite dev.
+psycopg2-binary==2.9.9
