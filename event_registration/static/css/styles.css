@@ -267,6 +267,48 @@ html, body {
   .participants-table { font-size: 13px; }
 }
 
+/* =========================================================================
+   Print styles — Paul Sealy, Block C
+   Attendees who print their /registration/<id> detail page get a clean
+   "ticket" instead of the website chrome.
+   ========================================================================= */
+@media print {
+  .site-header,
+  .site-footer,
+  nav.site-nav,
+  .organiser-actions,
+  .flash,
+  .action-row {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  .detail-card,
+  .form-card,
+  main {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .mono,
+  [class*="ref"] {
+    font-size: 18pt;
+    font-weight: 700;
+    letter-spacing: 0.5pt;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #444;
+  }
+  .detail-card { page-break-inside: avoid; }
+}
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
