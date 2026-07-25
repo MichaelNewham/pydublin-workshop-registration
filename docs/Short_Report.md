@@ -109,6 +109,17 @@ pipeline rebuilt and redeployed the public URL automatically - so the tutor
 always sees a version of the app that has passed both peer review and
 automated checks.
 
+Pull requests landed:
+
+| # | Title | Author | Block |
+|---|---|---|---|
+| #1 | fix(ui+auth): gate organiser routes + remove over-extrapolated clipboard | `MichaelNewham` | A |
+| #2 | Add day-of schedule to home page | `durnescus` (Sergiu) | B |
+| #3 | Complete template usability and accessibility improvements | `durnescus` (Sergiu) | B |
+| #4 | Add print stylesheet + aria-live on char counter | `sealymonster` (Paul) | C |
+
+PR catalog: https://github.com/MichaelNewham/pydublin-workshop-registration/pulls?q=is%3Apr
+
 ### User journeys
 
 - **Attendee:** Home -> Register -> submit -> sees their own confirmation ref
@@ -133,6 +144,9 @@ automated checks.
 | Capacity + duplicate-email enforcement     | `register()` in `routes.py` (SQLAlchemy queries)    |
 | HTML / CSS styling                          | `templates/base.html` + `static/css/styles.css` |
 | JavaScript interaction (live char counter) | `static/js/app.js` (notes count-down, vanilla JS) |
+| Page titles + accessibility pass (Block B, PR #3) | `<title>` block + `aria-label`/`scope="col"` across `templates/*.html` |
+| Char-counter `aria-live` (Block C, PR #4)  | `app.js` sets `aria-live="polite"` + `aria-atomic` on every `.js-notes-counter` |
+| Print stylesheet ("ticket" printouts) (Block C, PR #4) | `@media print` block in `static/css/styles.css` |
 
 ### Screenshots of major screens
 
