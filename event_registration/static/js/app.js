@@ -6,7 +6,10 @@
 
    Live character counter: any textarea next to a .js-notes-counter
    updates the "NNN characters left" hint as the user types. Turns red
-   when the limit is exceeded. Pure vanilla JS, no libraries.
+   when the user has 20 or fewer characters left, so the interaction
+   is visible on screen (the maxlength attribute hard-blocks typing
+   past 280, so the older "remaining < 0" check was unreachable).
+   Pure vanilla JS, no libraries.
 
    An earlier version of this file also implemented a clipboard copy
    button on the home page. The group removed that as over-extrapolated
@@ -29,7 +32,10 @@
       function update() {
         var remaining = max - (textarea.value || '').length;
         counter.textContent = remaining + ' characters left';
-        counter.style.color = remaining < 0 ? '#b3261e' : '';
+        // Turn red when the user is close to the limit, so the
+        // interaction is visible on screen (not just at <0, which
+        // never happens because maxlength=280 hard-blocks typing).
+        counter.style.color = remaining <= 20 ? '#b3261e' : '';
       }
       textarea.addEventListener('input', update);
       update();
