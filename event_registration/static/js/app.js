@@ -22,6 +22,8 @@
     Array.prototype.forEach.call(counters, function (counter) {
       var textarea = counter.previousElementSibling;
       if (!textarea || textarea.tagName !== 'TEXTAREA') { return; }
+      counter.setAttribute('aria-live', 'polite');
+      counter.setAttribute('aria-atomic', 'true');
       var max = parseInt(textarea.getAttribute('maxlength'), 10) || 280;
 
       function update() {
