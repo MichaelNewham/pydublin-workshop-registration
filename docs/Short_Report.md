@@ -2,7 +2,6 @@
 
 > Final length: **target 8 pages** (excluding this markdown's front matter and
 > appendices). Export to PDF before submission.
-> Group members should fill the `[TODO]` placeholders.
 
 ---
 
@@ -16,8 +15,9 @@
   - Sergiu D (261024894) - Block B: Client Forms (25%)
   - Paul Sealy (261018041) - Block C: Theme, CSS & JS (25%)
   - Alessandro Genco (262016773) - Block D: Docs, Testing & PM (20%)
-- **Date:** `[TODO submission date]`
+- **Date:** 2026-07-25 *(planned submission date — update on final upload)*
 - **Live app:** https://pydublin-workshop-registration.onrender.com
+- **Source code:** https://github.com/MichaelNewham/pydublin-workshop-registration
 
 ---
 
@@ -25,16 +25,33 @@
 
 *~½ page*
 
-[TODO] A small community workshop (40 seats) needs a registration system that:
+**PyCon Ireland 2026 — "Python for Business"** is a small one-day workshop
+cap-ed at **40 seats**, organised by a volunteer team with no dedicated
+administraïve staff. The organisers need a way for attendees to self-register
+online before the event and for the organisers to **manage** those
+registrations end-to-end:
 
-- Lets attendees self-register online without contacting an organiser.
-- Captures enough info (name, email, phone, company) for name badges and catering.
-- Stops overbooking by enforcing the venue capacity.
-- Lets the organiser **list**, **view**, **edit**, and **cancel** registrations
-  without touching a spreadsheet.
+- Attendees must be able to **self-register online** (name, email, phone,
+  company, optional accessibility notes) without emailing a human, so that
+  the data captured matches what is needed for **name badges and catering**.
+- The system must **prevent overbooking** by enforcing the venue's 40-seat
+  capacity, and **prevent duplicate sign-ups** (one seat per email).
+- The organisers must be able to **list, view, edit, and cancel**
+  registrations without touching a spreadsheet, so catering and badge counts
+  stay accurate in real time.
+- Attendee contact details (name, email, phone, accessibility notes) must
+  not be scraped by the public internet, but individual attendees must
+  still see their own confirmation page after registering.
 
-Previously the team used an Excel sheet by email; duplicate sign-ups,
-overbookings, and lost edits were common.
+**Before this project**, registration was run on an Excel spreadsheet
+attached to an email thread. That workaround produced three recurring
+problems the team wanted to eliminate: (i) **duplicate sign-ups** (the same
+person emailed twice and took two seats); (ii) **overbookings** (the
+sheet's running count lagged behind reality, so a 41st attendee was
+sometimes accepted); and (iii) **lost edits** (a typo'd name on a badge
+originated from an out-of-date, locally-saved copy of the sheet). This
+project replaces that spreadsheet with a small, web-based, single-source-
+of-truth application.
 
 ## 2. Solution overview
 
@@ -45,7 +62,37 @@ templates, plain CSS, and a small vanilla-JS interaction. The whole project is
 version-controlled in git and auto-deploys to Render on every push, so the
 tutor gets a stable public URL with zero human steps after the initial setup.
 
-[TODO: insert architecture diagram/screenshot]
+### Architecture
+
+```mermaid
+flowchart TB
+  subgraph Client["User's browser"]
+    HTML["Jinja2 templates<br/>(HTML + CSS + vanilla JS)"]
+    JS["static/js/app.js<br/>live char counter"]
+  end
+
+  subgraph Server["Render web service (gunicorn)"]
+    FLASK["Flask app<br/>create_app() factory"]
+    ROUTES["routes.py<br/>(HTTP routes + validation)"]
+    AUTH["auth.py<br/>@login_required gate"]
+    MODELS["models.py<br/>Event + Registration ORM"]
+  end
+
+  subgraph Persistence["External database"]
+    PG[("PostgreSQL on Neon<br/>(prod via DATABASE_URL)")]
+    SQL[("SQLite<br/>(local dev & CI fallback)")]
+  end
+
+  HTML <--> FLASK
+  JS -.observes notes field.-> HTML
+  FLASK --> ROUTES --> AUTH --> MODELS
+  MODELS -->|SQLAlchemy| PG
+  MODELS -.if DATABASE_URL unset.- SQL
+```
+
+**Pipeline:** `git push` to `main` → GitHub Actions CI (compile + flake8 +
+boot smoke test) → on green, Render Blueprint auto-redeploys from the same
+commi and registration data persists in Neon Postgres across redeploys.
 
 ### Team workflow
 
@@ -87,7 +134,45 @@ automated checks.
 | HTML / CSS styling                          | `templates/base.html` + `static/css/styles.css` |
 | JavaScript interaction (live char counter) | `static/js/app.js` (notes count-down, vanilla JS) |
 
-[TODO: 2–3 annotated screenshots of each major screen]
+### Screenshots of major screens
+
+The screenshots below were captured against the live deployment at
+https://pydublin-workshop-registration.onrender.com by Sergiu D (Block B)
+and committed to the repo with his consent. See
+`docs/screenshots/PROVENANCE.md` for the per-file attribution.
+
+![Home / event information page](screenshots/01-home.png)
+*Figure 1 — Event information page (`GET /`). Shows the event title,
+date, location, price, live "seats remaining" count, the Register CTA,
+and the provisional Day-of schedule section added in PR #2.*
+
+![Registration form](screenshots/02-register.png)
+*Figure 2 — Registration form (`GET /register`) with name, email, phone,
+company, and notes fields. The notes field has the live character counter
+(visible below the textarea) — that's the mandated JavaScript
+interaction.*
+
+![Public detail page](screenshots/04-detail.png)
+*Figure 4 — Attendee's confirmation page (`GET /registration/<id>`),
+reachable but not linked publicly. Shows the registration ref
+`PYDUB-2026-XXXX` and the registered details.*
+
+![Organiser login](screenshots/05-login.png)
+*Figure 5 — Shared-password organiser login (`GET /login`). Replaces
+full user accounts for the marking demo (see §7 Limitations).*
+
+![Participants list (organiser)](screenshots/06-participants.png)
+*Figure 6 — Participants list seen by the organiser (`GET /participants`
+after login), sorted newest-first, with per-row View actions.*
+
+![Edit registration](screenshots/10-edit.png)
+*Figure 7 — Edit-registration form (`GET /registration/<id>/edit`),
+organiser-only. All fields pre-populated; notes counter still active.*
+
+> **Outstanding (Block D):** Figures 3 (char-counter in action), 8
+> (duplicate-email error), and 9 (sold-out / validation error) are
+> referenced in `Short_Report.md` §6.3 but were not in Sergiu's capture.
+> Alessandro will re-shoot them during final report assembly.
 
 ## 4. Technologies / tools used
 
@@ -185,7 +270,13 @@ live app):
 | 10| Login with wrong password                            | Form re-renders, no session set            | ✓    |
 | 11| Refresh Participants after cancelling                | Cancelled row hidden from default view     | ✓    |
 
-[TODO: attach screenshots for the most important scenarios.]
+The error-path scenarios are illustrated below. Figures 8 (duplicate-email)
+and 9 (sold-out / validation) were not part of Sergiu's capture and remain
+outstanding for Block D.
+
+![404 custom error page](screenshots/09-error-404.png)
+*Figure 8 — Custom 404 error page (`templates/error.html`) shown when a
+non-existent registration id is requested (smoke-test row in §6.2).*
 
 ## 7. Limitations & future improvements
 
