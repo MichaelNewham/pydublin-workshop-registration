@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="description" content="Academic project demo - event registration app (D4B Business Programming). Not affiliated with Python Ireland / PyCon Ireland." />
-  <title>{{ site_title }} - Event Registration</title>
+  <title>{% block title %}{{ site_title }} - Event Registration{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
     <a href="{{ url_for('routes.home') }}" class="brand">
       <span class="brand-mark">Py</span>Con Ireland 2026
     </a>
-    <nav class="site-nav">
+    <nav class="site-nav" aria-label="Main navigation">
       <a href="{{ url_for('routes.home') }}">Event</a>
       <a href="{{ url_for('routes.register') }}">Register</a>
       {% if is_organiser %}

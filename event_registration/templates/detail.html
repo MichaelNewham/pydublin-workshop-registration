@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Registration details - {{ site_title }}{% endblock %}
 {% block content %}
 
 <section class="detail-card">
@@ -8,7 +9,7 @@
   </header>
 
   <dl class="kv">
-    <div><dt>Email</dt><dd>{{ reg.email }}</dd></div>
+    <div><dt>Email</dt><dd><a href="mailto:{{ reg.email }}">{{ reg.email }}</a></dd></div>
     <div><dt>Phone</dt><dd>{{ reg.phone or '-' }}</dd></div>
     <div><dt>Company</dt><dd>{{ reg.company or '-' }}</dd></div>
     <div><dt>Registered at</dt>
@@ -17,7 +18,7 @@
          <dd>
            <span class="status-pill
              {% if reg.status == 'registered' %}status-ok{% else %}status-cancelled{% endif %}">
-             {{ reg.status|title }}
+             {{ "Active" if reg.status == "registered" else "Cancelled" }}
            </span>
          </dd></div>
     <div><dt>Notes</dt><dd>{{ reg.notes or '(no notes)' }}</dd></div>
