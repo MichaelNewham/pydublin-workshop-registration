@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Event information - {{ site_title }}{% endblock %}
 {% block content %}
 
 {% if event %}
@@ -116,7 +117,7 @@
 {% else %}
 <div class="empty-state">
   <h1>No event configured</h1>
-  <p>The database has no Event yet. Run <code>flask seed</code> or check the logs.</p>
+  <p>No event is currently available. Please check the application configuration.</p>
 </div>
 {% endif %}
 
