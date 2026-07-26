@@ -27,3 +27,7 @@ event_registration/app.db
 
 # --- Local env ---
 .env
+
+# --- Submission artefacts (built at hand-in time, never committed) ---
+*-submission.zip
+pydublin-submission.zip

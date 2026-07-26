@@ -36,7 +36,6 @@ docs/Short_Report.pdf      # export from Short_Report.md + screenshots
 docs/Short_Report.md       # source too, in case the tutor wants it
 docs/AI_USE_STATEMENT.md
 docs/Individual_Contribution.csv
-docs/Video_Demo_script.md
 docs/Video_Demo.mp4         # <- added at ZIP-build time, not committed to git
 docs/screenshots/          # embedded in the report
 ```
@@ -52,7 +51,10 @@ Prerequisites outside git (do these first):
 1. Export `docs/Short_Report.md` -> `docs/Short_Report.pdf` (≤8 pages
    excluding appendices).
 2. Stitch the four individual `.mp4` contributions into one `docs/Video_Demo.mp4`
-   (≤7 minutes), following `docs/Video_Demo_script.md`.
+   (≤7 minutes). The video must cover the points the brief requires:
+   the problem, the solution working, the main features, a technical
+   explanation, and each student's contribution. (Keep internal
+   shotlists out of the repo.)
 
 From inside the `Project/` folder:
 
@@ -85,7 +87,7 @@ You should see `event_registration/` files, `docs/Short_Report.*`,
 - [ ] No `[TODO]` markers left in `docs/Short_Report.md`
 - [ ] Screenshots embedded in `Short_Report.md` and the exported PDF
 - [ ] `Short_Report.pdf` is <= 8 pages (excluding appendices)
-- [ ] Demo video MP4 is <= 7 minutes and follows `Video_Demo_script.md`
+- [ ] Demo video MP4 is <= 7 minutes and covers: problem, working solution, main features, technical explanation, per-student contribution
 - [ ] `Individual_Contribution.csv` sums to 100 %
 - [ ] ZIP opens cleanly on a fresh machine (no broken paths)
 - [ ] Moodle upload successful before the deadline
