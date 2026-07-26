@@ -7,7 +7,7 @@ Programming**, Option A (Event Registration Web App).
 |-------|---------|-----------:|-------|------|--:|
 | A - Backend & Data    | **Michael Newham**   | 261012020 | 261012020@digital4business.eu | SQLAlchemy models, Flask routes, validation, organiser gate | 30% |
 | B - Templates         | **Sergiu D**         | 261024894 | 261024894@digital4business.eu | Jinja2 templates (home/register/participants/detail/edit), navigation, JS hook | 25% |
-| C - Theme, CSS & JS   | **Paul Sealy**       | 261018041 | 261018041@digital4business.eu | styles.css, the JavaScript char-counter interaction, responsiveness, PyCon rebrand | 25% |
+| C - Theme, CSS & JS   | **Paul Sealy**       | 261018041 | 261018041@digital4business.eu | styles.css (@media print "ticket" stylesheet), responsiveness improvements, `aria-live` accessibility pass on the JS char-counter interaction | 25% |
 | D - Docs, Testing & PM| **Alessandro Genco** | 262016773 | 262016773@digital4business.eu | report, AI statement, video, git integration, manual test log, final QA     | 20% |
 |                       |                      |            | **Total**                                      | **100%** |
 

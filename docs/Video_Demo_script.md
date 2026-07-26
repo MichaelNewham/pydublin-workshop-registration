@@ -89,16 +89,22 @@ URL on Render.
 
 **On-screen:** Table from `docs/Individual_Contribution.csv`.
 
-- **Michael Newham (261012020, Block A):** database schema + server functions + validation.
-- **Sergiu D (261024894, Block B):** the five client Forms + form logic + navigation.
-- **Paul Sealy (261018041, Block C):** theme - HTML shell + CSS + the JS interaction.
-- **Alessandro Genco (262016773, Block D):** docs + test log + report + this video + git integration.
+- **Michael Newham (261012020, Block A):** SQLAlchemy models (Event <-> Registration FK), Flask routes, server-side validation (capacity + duplicate-email), the shared-password organiser gate (`auth.py` + `/login`).
+- **Sergiu D (261024894, Block B):** the Jinja2 templates (home/register/participants/detail/edit/error/login) + the day-of schedule section + the accessibility pass (page titles, aria-labels, table scopes).
+- **Paul Sealy (261018041, Block C):** CSS - the print "ticket" stylesheet and the `aria-live` accessibility pass on the JavaScript character-counter interaction.
+- **Alessandro Genco (262016773, Block D):** docs + the final screenshot set + Individual_Contribution.csv evidence + release-manager duties + this video script.
 
 ## 6:30–7:00 — Limitations & wrap
 
-**Say:** We did not implement auth — it's on the future-work list. But the
-core flow works end-to-end and is fully covered by our manual test log. Thanks
-for watching.
+**Say:** A couple of limitations to be honest about. The organiser side
+is gated by a **single shared password**, not per-user accounts; a real
+production deploy would use Flask-Login with bcrypt + rate-limiting on
+`/login`. The demo seeds a single event, and price is informational -
+no payment is taken. But the core registration flow - capacity checks,
+duplicate-email checks, soft-delete audit trail, and the JavaScript
+character-counter interaction - is fully covered by our manual test log
+in section 6 of the report, and CI is green on every commit to `main`.
+Thanks for watching.
 
 ---
 
