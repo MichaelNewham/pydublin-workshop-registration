@@ -151,9 +151,12 @@ PR catalog: https://github.com/MichaelNewham/pydublin-workshop-registration/pull
 ### Screenshots of major screens
 
 The screenshots below were captured against the live deployment at
-https://pydublin-workshop-registration.onrender.com by Sergiu D (Block B)
-and committed to the repo with his consent. See
-`docs/screenshots/PROVENANCE.md` for the per-file attribution.
+https://pydublin-workshop-registration.onrender.com. The bulk of the
+set was captured by Sergiu D (Block B) and committed to the repo with
+his consent; the three error-path / JS figures (Figures 3, 8, 9) were
+re-shot by Alessandro Genco (Block D) as part of his release-manager
+duties. See `docs/screenshots/PROVENANCE.md` for the per-file
+attribution.
 
 ![Home / event information page](screenshots/01-home.png)
 *Figure 1 — Event information page (`GET /`). Shows the event title,
@@ -165,6 +168,13 @@ and the provisional Day-of schedule section added in PR #2.*
 company, and notes fields. The notes field has the live character counter
 (visible below the textarea) — that's the mandated JavaScript
 interaction.*
+
+![JavaScript character counter in action](screenshots/03-char-counter.png)
+*Figure 3 — JavaScript interaction (Block D capture): the live character
+counter on the notes field updates on every keystroke and turns red
+once the user crosses the 280-character limit. Pure vanilla JS in
+`static/js/app.js`; counter exposes `aria-live="polite"` so screen
+readers announce the remaining count (Block C accessibility pass, PR #4).*
 
 ![Public detail page](screenshots/04-detail.png)
 *Figure 4 — Attendee's confirmation page (`GET /registration/<id>`),
@@ -183,10 +193,12 @@ after login), sorted newest-first, with per-row View actions.*
 *Figure 7 — Edit-registration form (`GET /registration/<id>/edit`),
 organiser-only. All fields pre-populated; notes counter still active.*
 
-> **Outstanding (Block D):** Figures 3 (char-counter in action), 8
-> (duplicate-email error), and 9 (sold-out / validation error) are
-> referenced in `Short_Report.md` §6.3 but were not in Sergiu's capture.
-> Alessandro will re-shoot them during final report assembly.
+> **Screenshot coverage complete.** Figures 3 (char-counter in action),
+> 8 (duplicate-email error), and 9 (validation error) were initially
+> missing from Sergiu's capture; Alessandro Genco (Block D) re-shot them
+> against the live URL on 25 Jul 2026 as part of his release-manager
+> duties. All ten screenshot slots referenced in §3 + §6.3 are now covered.
+> See `docs/screenshots/PROVENANCE.md`.
 
 ## 4. Technologies / tools used
 
@@ -284,13 +296,25 @@ live app):
 | 10| Login with wrong password                            | Form re-renders, no session set            | ✓    |
 | 11| Refresh Participants after cancelling                | Cancelled row hidden from default view     | ✓    |
 
-The error-path scenarios are illustrated below. Figures 8 (duplicate-email)
-and 9 (sold-out / validation) were not part of Sergiu's capture and remain
-outstanding for Block D.
+The error-path scenarios are illustrated below. Figures 8 and 9 were
+re-shot by Alessandro Genco (Block D) on 25 Jul 2026 to cover the
+duplicate-email and validation-error paths that were not in Sergiu's
+original set.
 
 ![404 custom error page](screenshots/09-error-404.png)
 *Figure 8 — Custom 404 error page (`templates/error.html`) shown when a
 non-existent registration id is requested (smoke-test row in §6.2).*
+
+![Duplicate-email validation error](screenshots/07-error-duplicate-email.png)
+*Figure 9 — Server-side validation: submitting a duplicate email is
+blocked with the "already registered" message (manual test row #3,
+§6.3). Enforced in `routes.py:register()` via a SQLAlchemy query before
+the row is written.*
+
+![Validation error on the registration form](screenshots/08-error-validation.png)
+*Figure 10 — Server-side validation: a form-level error is surfaced on
+the registration form (manual test rows #2 + #4, §6.3). The same
+feedback pattern is reused for the sold-out / capacity case.*
 
 ## 7. Limitations & future improvements
 
