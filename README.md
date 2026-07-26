@@ -1,247 +1,221 @@
-# PyCon Ireland 2026 - Event Registration System
+# PyCon Ireland 2026 — Event Registration System
+
+> **Course:** D4B — Elective 2: Business Programming (Option A — Event Registration Web App)
+> **Team:** Michael Newham · Sergiu D · Paul Sealy · Alessandro Genco
+
+> **🔴 Live app (click to try it):** https://pydublin-workshop-registration.onrender.com
+> **📦 Source code:** https://github.com/MichaelNewham/pydublin-workshop-registration
+> **🟢 CI status:** [![CI](https://github.com/MichaelNewham/pydublin-workshop-registration/actions/workflows/ci.yml/badge.svg)](https://github.com/MichaelNewham/pydublin-workshop-registration/actions)
 
 A small web application for event registration, built with **Python + Flask
-+ SQLAlchemy + SQLite**, plus Jinja2 templates, plain CSS, and vanilla JS.
++ SQLAlchemy** and a SQLite (dev) / Postgres (prod) database, plus Jinja2
+templates, plain CSS, and one vanilla-JS interaction.
 
-Final project for **D4B - Elective 2: Business Programming** (**Option A** -
-Event Registration Web App).
+> ⏱️ The live app is on Render's free tier. The first request after an
+> idle period may take ~30–50 s to cold-start; subsequent requests are fast.
 
-> **Live app:** https://pydublin-workshop-registration.onrender.com
-> (Render free tier - first hit may take up to 50 s to cold-start, then fast.)
+---
 
-> See `Project - Business Programming May 2026 - Guidelines.pdf` for the
-> official brief. This README explains how to **run locally**, how to
-> **deploy**, and how the project is organised.
+## Try the live app (30-second walkthrough)
+
+You don't need to clone anything — just click through the live deployment.
+
+1. **Home / event information page** — https://pydublin-workshop-registration.onrender.com/
+   *(Shows the event title, date, location, price, live "seats remaining"
+   count, and the day-of schedule.)*
+2. **Registration form (public)** — https://pydublin-workshop-registration.onrender.com/register
+   *(Type a note → watch the live character counter turn red past 280 chars.
+   That's the JavaScript interaction.)*
+3. **Submit** → you'll be redirected to your own confirmation page at
+   `/registration/<id>`. Try the **same email again** → server blocks it.
+4. **Organiser area (gated)** — https://pydublin-workshop-registration.onrender.com/login
+   Password (demo only): **`pydublin-2026`**
+   → Shows the Participants list, lets you **Edit**, **Cancel**, and **Restore**.
+5. Without the password, `/participants` correctly redirects to `/login`
+   (attendee data is **not** publicly scrapable).
 
 ---
 
 ## What it does
 
-A simple but complete event-registration tool for a small workshop:
+| Feature                                         | Where (Flask)                                       |
+|-------------------------------------------------|-----------------------------------------------------|
+| Event information page                          | `GET /` → `templates/home.html`                     |
+| Registration form with server-side validation   | `GET /POST /register` → `templates/register.html`   |
+| List of participants (organiser)                | `GET /participants` → `templates/participants.html` |
+| Detail page per registration                    | `GET /registration/<id>` → `templates/detail.html`  |
+| Edit / Cancel / Restore (soft-delete audit)     | `/registration/<id>/{edit,cancel,restore}`          |
+| Two related tables (`Event` 1 — N `Registration`) | `event_registration/models.py` (SQLAlchemy FK)    |
+| Server-side capacity + duplicate-email checks   | `register()` in `event_registration/routes.py`      |
+| Shared-password organiser gate (`/login`)       | `event_registration/auth.py` + `@login_required`    |
+| Basic HTML / CSS styling (responsive, accessible) | `templates/base.html` + `static/css/styles.css`     |
+| JavaScript interaction — live char counter | `static/js/app.js` (vanilla, no libraries)          |
 
-- **Event information page** - date, location, description, price, seats remaining
-- **Registration form** - name, email, phone, company, notes (with
-  email-uniqueness + capacity checks enforced on the server)
-- **List of participants** for the organiser, sorted newest-first
-- **Detail page** per registration, with edit / cancel / restore actions
-- **Two related database tables** - `Event` `<` `Registration` with a
-  foreign key (1-to-many)
-- **HTML / CSS styling** - custom stylesheet, responsive, accessible
-- **One JavaScript interaction** - a live character counter on the notes
-  field (`static/js/app.js`), so the user knows when they have hit the 280-
-  character limit. Pure vanilla JS, no libraries.
-- **Shared-password organiser gate** - the participants list and the
-  edit/cancel/restore endpoints are gated behind a single shared password
-  (`/login`) so attendee data is not publicly scrapable. The registration
-  flow and the attendee's own detail page stay public.
+Capacity is enforced in `routes.py:register()`: a `MAX_CAPACITY` query on
+`Event` blocks overbooking. Duplicate emails are blocked with a server-side
+"You're already registered" message. Cancellation is a soft-delete
+(`status = 'cancelled'`) so the audit trail is preserved and the seat is
+freed.
+
+---
 
 ## Tech stack
 
-| Layer      | Tech                                                    |
-|------------|---------------------------------------------------------|
-| Language   | Python 3.11                                             |
-| Framework  | Flask 3 (`flask`)                                       |
-| ORM        | SQLAlchemy (`flask_sqlalchemy`)                         |
-| Database   | Postgres on Render (managed). SQLite locally (`instance/app.db`). Registrations PERSIST across redeploys via `DATABASE_URL` env var. See [Making registrations persist](#making-registrations-persist) below. |
-| Templates  | Jinja2 (ships with Flask)                               |
-| Styling    | Plain CSS in `static/css/styles.css`                    |
-| JS         | Vanilla JS in `static/js/app.js` (no libraries)         |
-| Server     | Gunicorn (production WSGI; Render runs this)            |
-| Deploy     | Render via `render.yaml` (push-to-deploy)               |
-| CI         | GitHub Actions (`.github/workflows/ci.yml`)             |
-
-> **CI note:** the workflow file lives in the repo but needs a one-time
-> permission grant to start running. See [`docs/CI_SETUP.md`](docs/CI_SETUP.md).
+| Layer     | Tech                                                |
+|-----------|-----------------------------------------------------|
+| Language  | Python 3.11                                         |
+| Framework | Flask 3                                             |
+| ORM       | SQLAlchemy (`flask_sqlalchemy`)                     |
+| DB        | Postgres on Render (prod) · SQLite (local + CI)     |
+| Templates | Jinja2 (ships with Flask)                           |
+| Styling   | Plain CSS in `static/css/styles.css`                |
+| JS        | Vanilla JS in `static/js/app.js` (no libraries)     |
+| WSGI      | Gunicorn                                            |
+| Deploy    | Render via `render.yaml` (push-to-deploy on `main`) |
+| CI        | GitHub Actions (lint + boot smoke test on every PR) |
 
 ---
 
-## Repository layout
+## Mapping to the Option A brief
 
-```
-Project/
-|- README.md                       <- you are here
-|- AUTHORS.md                      <- the four students + IDs
-|- requirements.txt                <- pip dependencies
-|- run.py                          <- dev entry point (python run.py)
-|- render.yaml                     <- Render push-to-deploy config
-|- Procfile                        <- alt deploy hint (web: gunicorn run:app)
-|- .env.example                    <- env-var template (copy to .env)
-|- .github/workflows/ci.yml        <- lint + boot-test on every push/PR
-|
-|- event_registration/             <- the Flask app (Python package)
-|  |- __init__.py                  <- create_app() factory + auto-seed
-|  |- config.py                    <- Config class (reads env vars)
-|  |- extensions.py                <- `db = SQLAlchemy()`
-|  |- models.py                    <- Event + Registration models (Block A)
-|  |- routes.py                    <- all HTTP routes + validation (Block A)
-|  |- seed.py                      <- idempotent seed on first boot
-|  |- templates/                   <- HTML (Block B)
-|  |  |- base.html                 <- shared layout (header / footer / CSS / JS)
-|  |  |- home.html, register.html
-|  |  |- participants.html, detail.html, edit.html, error.html
-|  |- static/
-|     |- css/styles.css            <- all styling (Block C)
-|     |- js/app.js                 <- the JavaScript interaction - char counter (Block C)
-|
-|- data/seed_events.csv            <- matches the seed_demo_data() in code
-|- docs/                           <- report, video script, contribution csv
-   |- Short_Report.md
-   |- Video_Demo_script.md
-   |- Individual_Contribution.csv
-   |- AI_USE_STATEMENT.md
-```
+| Requirement (from the Guidelines)    | Where in this repo                                     |
+|--------------------------------------|--------------------------------------------------------|
+| Event information page               | `routes.home` → `templates/home.html`                  |
+| Registration form                    | `routes.register` → `templates/register.html`          |
+| Database to store registrations      | `models.py` — `Event` + `Registration` (SQLAlchemy)   |
+| List of registered participants      | `routes.participants` → `templates/participants.html`  |
+| Detail page for each registration    | `routes.detail` → `templates/detail.html`              |
+| Edit or cancel a registration        | `routes.edit` / `routes.cancel` / `routes.restore`     |
+| Basic HTML/CSS styling               | `templates/base.html` + `static/css/styles.css`        |
+| At least one JavaScript interaction  | `static/js/app.js` (live character counter)            |
+| Two related tables                   | `Registration.event_id` → `Event.id` (foreign key)     |
+| README                               | this file                                              |
+| Short report (≤8 pages)              | [`docs/Short_Report.md`](docs/Short_Report.md)         |
+| Video demonstration (≤7 min)         | script at [`docs/Video_Demo_script.md`](docs/Video_Demo_script.md); the MP4 ships inside the Moodle ZIP |
+| AI-use statement                     | [`docs/AI_USE_STATEMENT.md`](docs/AI_USE_STATEMENT.md) |
+| Individual contribution              | [`docs/Individual_Contribution.csv`](docs/Individual_Contribution.csv) |
 
 ---
 
-## How to run
-
-### Local development
+## Run it locally
 
 ```bash
-# 1. Clone + enter the repo
+# 1. Clone
 git clone https://github.com/MichaelNewham/pydublin-workshop-registration
 cd pydublin-workshop-registration
 
-# 2. (Optional but recommended) virtualenv
+# 2. Virtualenv
 python -m venv .venv && source .venv/bin/activate
 
-# 3. Install dependencies
+# 3. Install
 pip install -r requirements.txt
 
-# 4. Run the dev server
+# 4. Run
 python run.py
-# -> open http://localhost:5000
+# → http://localhost:5000
 ```
 
-On first boot the schema is created and a demo Event + two sample
-registrations are seeded automatically (`seed.py`), so the home and
-participants pages are non-empty without any setup.
+On first boot the schema is auto-created and a demo Event plus two sample
+registrations are seeded (`event_registration/seed.py`), so the home and
+participants pages are non-empty without any setup. Optionally override the
+shared organiser password with `ORGANISER_PASSWORD=...` and the database
+with `DATABASE_URL=postgresql://...` (see `.env.example`).
 
-### Production / live deploy (Render - free tier)
-
-This repo has a `render.yaml`, so deployment is push-to-deploy:
-
-1. Go to https://render.com and sign in with GitHub (one-time).
-2. **New -> Blueprint** -> pick this repo.
-3. Render reads `render.yaml`, installs deps, runs `gunicorn run:app`.
-4. You get a stable public URL like
-   `https://pydublin-workshop-registration.onrender.com`.
-5. **Every `git push` to `main` triggers an auto-redeploy** - so the tutor
-   always sees the latest code.
-
-**The current live deployment**: https://pydublin-workshop-registration.onrender.com
-(auto-synced from `main`; see the Render dashboard for deploy history).
-
-SQLite on Render is ephemeral - the DB resets on each deploy. That's
-intentional for a marking demo (the seed runs fresh each time). For a
-production build, swap `DATABASE_URL` to a Render Postgres instance.
-
-### Making registrations persist
-
-Render's free web tier has an **ephemeral filesystem** - any file written
-at runtime (including `app.db`) is wiped on every deploy, rebuild, and
-idle cold start. That means registration data does not survive a redeploy
-unless the database lives **outside the container**.
-
-To make registrations persist (the current production setup):
-
-1. Create a free Postgres instance at
-   [neon.tech](https://neon.tech) (sign in with GitHub).
-2. Copy its connection string (looks like
-   `postgresql://user:password@ep-xxxx.region.aws.neon.tech/dbname?sslmode=require`).
-3. In the Render dashboard: **pydublin-workshop-registration -> Environment
-   -> Add Environment Variable -> `DATABASE_URL`** -> paste the string.
-4. Trigger a redeploy (any `git push` to `main` works, or click
-   **Manual Deploy** on Render).
-
-The app:
-- auto-rewrites the legacy `postgres://` scheme to `postgresql://`
-  (SQLAlchemy 2.x rejects the short form),
-- enables `pool_pre_ping` + a sub-5-minute `pool_recycle` so Neon's
-  idle-suspend doesn't break long-lived gunicorn workers,
-- falls back to local SQLite if `DATABASE_URL` is unset (so local dev and
-  CI keep working with no extra setup).
-
-Seed behaviour: `seed.py` only seeds Alice Example, Bob Demo **and Minnie
-Mouse** on an empty database. Once seeded, registrations persist forever -
-real attendee signups are never overwritten by redeploys.
-
----
-
-## Decisions and assumptions
-
-| Decision           | Value                                                |
-|--------------------|------------------------------------------------------|
-| Option             | A - Event Registration Web App                       |
-| Stack              | Flask + SQLAlchemy + SQLite + Jinja2 + plain CSS/JS  |
-| Event type         | Workshop                                             |
-| Event name         | PyCon Ireland 2026 - Python for Business         |
-| Registration fields| name, email, phone, company, notes                   |
-| Organiser gate      | Shared password at `/login` (env: `ORGANISER_PASSWORD`)   |
-| Git remote         | `MichaelNewham/pydublin-workshop-registration` (public) |
-
----
-
-## Development workflow (small team, 4 people)
-
-The project is split into four functional blocks that together cover the
-entire repo. The split mirrors the `Group_Evaluation.pdf` role template
-(database/backend 30%, interface/design 25%, testing/docs 25%,
-integration/PM 20%):
-
-| Block | Owner            | Role                | Owns                                                          | %   |
-|-------|------------------|---------------------|---------------------------------------------------------------|-----|
-| **A** | Michael Newham   | Backend & Data      | `models.py`, `routes.py`, `seed.py`, `config.py` (ORM + CRUD + validation) | 30% |
-| **B** | Sergiu D         | Templates (Views)   | All `templates/*.html` + the form/list/detail/edit UIs        | 25% |
-| **C** | Paul Sealy       | CSS + JavaScript    | `static/css/styles.css` + `static/js/app.js` (incl. the JS interaction + responsiveness) | 25% |
-| **D** | Alessandro Genco | Docs, Testing & PM  | `README.md`, `docs/`, `render.yaml`, CI workflow, demo video, final QA | 20% |
-
-### Build order
-
-1. **A (Michael)** lands the models + routes first - every other block calls into the URL routes.
-2. **B (Sergiu)** builds the five Jinja templates on top of A's routes, wiring up the forms and navigation.
-3. **C (Paul)** can start in parallel with B - the CSS classes are decoupled from the markup. Adds the JS interaction in `static/js/app.js`.
-4. **D (Alessandro)** drafts `docs/` alongside A/B/C; writes the test log as features land; records the demo video and does final QA last.
-
-A is the only hard prerequisite (B's templates need A's routes). C is fully
-parallel. See `docs/Individual_Contribution.csv` for the canonical split.
-
-> **New to the project?** The per-student setup guide + tasks per block is in
-> [`docs/COLLABORATOR_NOTES.md`](docs/COLLABORATOR_NOTES.md).
-
----
-
-## Mapping to course requirements (Option A deliverables)
-
-| Requirement (from the Guidelines PDF)  | Where in this repo                                  |
-|----------------------------------------|-----------------------------------------------------|
-| Event information page                 | `routes.home` -> `templates/home.html`              |
-| Registration form                      | `routes.register` -> `templates/register.html`      |
-| Database to store registrations        | `models.py` (SQLAlchemy, `Event` + `Registration`)  |
-| List of registered participants        | `routes.participants` -> `templates/participants.html` |
-| Detail page for each registration      | `routes.detail` -> `templates/detail.html`          |
-| Edit or cancel a registration          | `routes.edit` / `routes.cancel` / `routes.restore`  |
-| Basic HTML/CSS styling                 | `templates/base.html` + `static/css/styles.css`     |
-| At least one simple JavaScript interaction | `static/js/app.js` (live character counter) |
-| Two related tables                     | `Registration.event_id` -> `Event.id` (FK)          |
-| README                                 | this file                                           |
-| AI-use statement                       | `docs/AI_USE_STATEMENT.md` (linked from the report) |
-| Short report                           | `docs/Short_Report.md`                              |
-| Demo video script                      | `docs/Video_Demo_script.md`                         |
-| Individual contribution                | `docs/Individual_Contribution.csv`                  |
-
----
-
-## Routes reference
+### Routes
 
 | Method | Path                              | Purpose                          |
 |--------|-----------------------------------|----------------------------------|
 | GET    | `/`                               | Event information page           |
 | GET    | `/register`                       | Show the registration form       |
 | POST   | `/register`                       | Create a registration            |
-| GET    | `/participants`                   | List all active registrations    |
 | GET    | `/registration/<id>`              | Detail page for one registration |
-| GET    | `/registration/<id>/edit`         | Show the edit form               |
-| POST   | `/registration/<id>/edit`         | Save edits                       |
-| POST   | `/registration/<id>/cancel`       | Cancel (soft-delete)             |
+| GET    | `/login`                          | Shared-password login (organiser) |
+| POST   | `/login` · `/logout`              | Sign in / sign out               |
+| GET    | `/participants`                   | List all active registrations (organiser) |
+| GET    | `/registration/<id>/edit`         | Show the edit form (organiser)   |
+| POST   | `/registration/<id>/edit`         | Save edits (organiser)           |
+| POST   | `/registration/<id>/cancel`       | Cancel — soft-delete (organiser) |
 | POST   | `/registration/<id>/restore`      | Restore a cancelled one          |
+
+---
+
+## Project structure
+
+```
+Project/
+├── event_registration/          # the Flask app
+│   ├── __init__.py              #   create_app() factory + auto-seed
+│   ├── config.py                #   env-driven configuration
+│   ├── extensions.py            #   db = SQLAlchemy()
+│   ├── models.py                #   Event + Registration models
+│   ├── routes.py                #   all HTTP routes + validation
+│   ├── auth.py                  #   shared-password organiser gate
+│   ├── seed.py                  #   idempotent first-boot seed
+│   ├── templates/*.html         #   Jinja2 templates (8 pages)
+│   └── static/{css,js}/         #   styles.css + app.js (the JS interaction)
+├── data/seed_events.csv         # matches seed_demo_data()
+├── docs/
+│   ├── Short_Report.md          # the ≤8-page report (export to PDF)
+│   ├── AI_USE_STATEMENT.md
+│   ├── Video_Demo_script.md     # the 7-min demo's shotlist
+│   ├── Individual_Contribution.csv  # the 30/25/25/20 split
+│   └── screenshots/             # embedded in the report
+├── run.py                       # `python run.py` entry point
+├── requirements.txt
+├── render.yaml · Procfile · .env.example
+└── .github/workflows/ci.yml     # GitHub Actions: lint + boot smoke test
+```
+
+---
+
+## Team & contribution
+
+| Block | Owner            | Role                | %   |
+|-------|------------------|---------------------|----:|
+| A — Backend & Data     | Michael Newham   | SQLAlchemy models, Flask routes, server-side validation, organiser auth gate | 30% |
+| B — Templates          | Sergiu D         | Jinja2 templates, day-of schedule, accessibility pass (page titles, aria-labels, table scopes) | 25% |
+| C — Theme, CSS & JS    | Paul Sealy       | `styles.css` print stylesheet, `aria-live` accessibility pass on the JS char counter | 25% |
+| D — Docs, Testing & PM | Alessandro Genco | Report finalisation, re-shooting outstanding screenshots, contribution CSV evidence, release QA | 20% |
+
+Full per-student evidence (PRs, files) in
+[`docs/Individual_Contribution.csv`](docs/Individual_Contribution.csv) and
+[`AUTHORS.md`](AUTHORS.md).
+
+### Coordination trail (Pull Requests)
+
+Every change landed on `main` via PR + CI; nothing bypassed review.
+
+| #    | Title                                                           | Author        | Block |
+|------|-----------------------------------------------------------------|---------------|-------|
+| [#1](https://github.com/MichaelNewham/pydublin-workshop-registration/pull/1) | Gate organiser routes + remove clipboard (privacy fix) | MichaelNewham | A |
+| [#2](https://github.com/MichaelNewham/pydublin-workshop-registration/pull/2) | Add day-of schedule to home page                        | durnescus     | B |
+| [#3](https://github.com/MichaelNewham/pydublin-workshop-registration/pull/3) | Complete template usability + accessibility              | durnescus     | B |
+| [#4](https://github.com/MichaelNewham/pydublin-workshop-registration/pull/4) | Print stylesheet + aria-live on char counter             | sealymonster  | C |
+| [#5](https://github.com/MichaelNewham/pydublin-workshop-registration/pull/5) | Fill Individual_Contribution.csv with PR evidence        | alexg3189     | D |
+| [#7](https://github.com/MichaelNewham/pydublin-workshop-registration/pull/7) | Land Block D screenshots + align report/CSV/script       | MichaelNewham | D |
+
+Full PR catalog: <https://github.com/MichaelNewham/pydublin-workshop-registration/pulls?q=is%3Apr>
+
+---
+
+## Production deployment
+
+The live URL is served by **Render** (free tier) using `render.yaml`:
+
+- Every `git push` to `main` triggers an auto-redeploy.
+- The production database is **PostgreSQL** (so registrations persist
+  across redeploys, unlike the ephemeral SQLite-on-Render default). The
+  connection string is held in the Render dashboard as `DATABASE_URL`.
+- Local dev and CI automatically fall back to SQLite when `DATABASE_URL`
+  is unset, so no extra setup is needed to clone-and-run.
+
+Deploy history (public): <https://dashboard.render.com/web/srv-d993mf77f7vs739o8q7g/deploys>
+
+---
+
+## License & attribution
+
+Academic project for **D4B — Elective 2: Business Programming**.
+Code © the four authors listed in [`AUTHORS.md`](AUTHORS.md). "PyCon
+Ireland" and Python branding are mentioned for context only and are
+trademarks of their respective owners; no affiliation is implied.
