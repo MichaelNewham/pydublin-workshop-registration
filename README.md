@@ -91,7 +91,7 @@ freed.
 | Two related tables                   | `Registration.event_id` → `Event.id` (foreign key)     |
 | README                               | this file                                              |
 | Short report (≤8 pages)              | [`docs/Short_Report.md`](docs/Short_Report.md)         |
-| Video demonstration (≤7 min)         | script at [`docs/Video_Demo_script.md`](docs/Video_Demo_script.md); the MP4 ships inside the Moodle ZIP |
+| Video demonstration (≤7 min)         | the MP4 ships inside the Moodle ZIP as `docs/Video_Demo.mp4`                |
 | AI-use statement                     | [`docs/AI_USE_STATEMENT.md`](docs/AI_USE_STATEMENT.md) |
 | Individual contribution              | [`docs/Individual_Contribution.csv`](docs/Individual_Contribution.csv) |
 
@@ -157,7 +157,6 @@ Project/
 ├── docs/
 │   ├── Short_Report.md          # the ≤8-page report (export to PDF)
 │   ├── AI_USE_STATEMENT.md
-│   ├── Video_Demo_script.md     # the 7-min demo's shotlist
 │   ├── Individual_Contribution.csv  # the 30/25/25/20 split
 │   └── screenshots/             # embedded in the report
 ├── run.py                       # `python run.py` entry point
